@@ -1,0 +1,70 @@
+tags:
+  - Contacts
+summary: Get all contacts
+operationId: getContacts
+description: "Get all contacts"
+security:
+  - bearerAuth: []
+parameters:
+
+  - in: query
+    name: page
+    description: Number of page
+    required: false
+    schema: 
+      type: integer
+      minimum: 1
+      default: 1
+      example: 5
+
+  - in: query
+    name: perPage
+    description: Number of elements per page
+    required: false
+    schema: 
+      type: integer
+      minimum: 1
+      default: 10
+      example: 2
+
+  - in: query
+    name: sortBy
+    description: Sort by _id
+    required: false
+    schema:
+      type: string
+      example: name
+
+  - in: query
+    name: sortOrder
+    description: Sorting direction
+    required: false
+    schema: 
+      type: string
+      enum: [asc, desc]
+      default: asc
+      example: desc
+  
+  - in: query
+    name: contactType
+    description: Filter by contact type work/home/personal
+    required: false
+    schema:
+      type: string
+      enum: ['work', 'home', 'personal']
+      example: home
+
+  - in: query
+    name: isFavourite
+    description: Filter by favourite flag (true/false)
+    required: false
+    schema:
+      type: boolean
+      example: true
+responses:
+  "200":
+    $ref: ../../components/responses/contacts/200_all_contacts.yaml
+  "401":
+    $ref: ../../components/responses/401.yaml
+  "500":
+    $ref: ../../components/responses/500.yaml

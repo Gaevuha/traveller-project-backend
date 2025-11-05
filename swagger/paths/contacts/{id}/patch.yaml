@@ -1,0 +1,36 @@
+tags:
+  - Contacts
+summary: Update a contact
+operationId: updateContact
+description: 'Update a contact. You can add or replace photos.'
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: id
+    required: true
+    schema:
+      type: string
+      example: '68ebeb8fdb4526608370cece'
+requestBody:
+  required: true
+  content:
+    multipart/form-data:
+      schema:
+        $ref: ../../../components/schemas/contact/updateContact.yaml
+responses:
+  '200':
+    $ref: '../../../components/responses/contacts/200_update_contact.yaml'
+
+  '400':
+    $ref: '../../../components/responses/400.yaml'
+
+  '401':
+    $ref: '../../../components/responses/401.yaml'
+
+  "404":
+    $ref: "../../../components/responses/contacts/404.yaml"
+
+  '500':
+    $ref: '../../../components/responses/401.yaml'
+
