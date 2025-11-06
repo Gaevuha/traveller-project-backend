@@ -11,4 +11,6 @@ const categoriesSchema = new Schema(
    }
 );
 
+categoriesSchema.index({ name: 1 }, { unique: true, collation: { locale: 'uk', strength: 2 } });
+
 export const CategoriesSchema = model('categories', categoriesSchema);
