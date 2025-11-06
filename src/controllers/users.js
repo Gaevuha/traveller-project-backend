@@ -1,3 +1,4 @@
+import * as usersService from '../services/users.js';
 import { getAllUsers, getUserById } from '../services/users.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
@@ -56,4 +57,27 @@ export const patchMeController = async (req, res) => {
     status: 200,
     message: `Successfully patched my profile!`,
   });
+};
+
+export const addSavedArticle = async (req, res) => {
+  try {
+    const userId = req.user._id; // з authMiddleware
+    const { articleId } = req.body;
+
+    if (!articleId) {
+      return res.status(400).json({ message: 'articleId is required' });
+    }
+
+    const savedArticles = await usersService.addArticleToSaved(
+      userId,
+      articleId,
+    );
+
+    res.status(200).json({
+      message: 'Article added to saved list',
+      savedArticles,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 };
