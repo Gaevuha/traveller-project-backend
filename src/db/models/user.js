@@ -11,6 +11,12 @@ const usersSchema = new Schema(
     email: { type: String, unique: true, required: true},
     password: { type: String, required: true},
 
+    savedStories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'stories',
+      },
+    ],
   },
   { timestamps: true, versionKey: false },
 );
