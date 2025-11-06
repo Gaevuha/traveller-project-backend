@@ -20,7 +20,7 @@ export const createStoryController = async (req, res) => {
 
 export const patchStoryController = async (req, res) => {
   const { storyId } = req.params;
-  const ownerId = req.user.id;
+  const ownerId = req.user._id;
   const updateFields = req.body;
   const storyImageFile = req.file;
 
