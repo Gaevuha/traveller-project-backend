@@ -7,6 +7,7 @@ import {
 } from '../controllers/stories.js';
 import { isValidId } from '../middlewares/isValidId.js';
 import { upload } from '../middlewares/multer.js';
+import authenticate from '../middlewares/authenticate.js';
 
 const router = Router();
 
@@ -17,6 +18,7 @@ router.get('/', ctrlWrapper(getAllStoriesController)); //створити пуб
 router.post('/', ctrlWrapper(createStoryController)); //створити приватний ендпоінт для СТВОРЕННЯ історії
 router.patch(
   '/:storyId',
+  authenticate,
   isValidId,
   upload.single('storyImage'),
   ctrlWrapper(patchStoryController),
