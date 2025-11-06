@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import { ctrlWrapper } from "../utils/ctrlWrapper.js";
-import { createMeSavedStoriesController, deleteMeSavedStoriesController, getMeProfileController, getUsersByIdController, patchMeAvatarController, patchMeController } from '../controllers/users.js';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+import { getAllUsersController, createMeSavedStoriesController, deleteMeSavedStoriesController, getMeProfileController, getUsersByIdController, patchMeAvatarController, patchMeController } from '../controllers/users.js';
 
 const router = Router();
 
 //публічні
+router.get('/', ctrlWrapper(getAllUsersController));
 router.get('/:userId',ctrlWrapper(getUsersByIdController)); // створити публічний ендпоінт на отримання даних про користувача за ID - дані користувача + список статей
 
 //Приватні

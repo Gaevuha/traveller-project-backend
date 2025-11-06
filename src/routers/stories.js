@@ -11,4 +11,5 @@ router.get('/', ctrlWrapper(getAllStoriesController)); //створити пуб
 router.post('/', ctrlWrapper(createStoryController)); //створити приватний ендпоінт для СТВОРЕННЯ історії
 router.patch('/:id', ctrlWrapper(patchStoryController)); //створити приватний ендпоінт для РЕДАГУВАННЯ історії
 
+
 export default router;

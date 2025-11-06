@@ -8,7 +8,6 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import cookieParser from 'cookie-parser';
 
-
 dotenv.config();
 
 const PORT = Number(getEnvVar('PORT', '3000'));
@@ -36,7 +35,6 @@ export async function setupServer() {
   //Додаємо роутер як middleware
   app.use(router);
 
-  
   app.use((req, res) => {
     res.status(404).json({
       message: 'Not found',
