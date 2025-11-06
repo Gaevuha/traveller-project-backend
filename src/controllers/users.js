@@ -1,5 +1,3 @@
-
-
 import { getAllUsers, getUserById } from '../services/users.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
