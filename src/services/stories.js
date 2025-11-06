@@ -1,7 +1,9 @@
+
 import Story from '../db/models/story.js';
 import { TravellersCollection } from '../db/models/traveller.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
+import mongoose from 'mongoose';
 import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 
 export const getAllStories = async (query) => {
@@ -43,8 +45,11 @@ export async function updateStoryById(
     updateData.storyImage = photoUrl;
   }
 
-  const rawResult = await Story.findOneAndUpdate(
-    { _id: storyId, owner: ownerId },
+  const storyObjectId = new mongoose.Types.ObjectId(storyId);
+  const ownerObjectId = new mongoose.Types.ObjectId(ownerId);
+
+  const rawResult = await TravellersCollection.findOneAndUpdate(
+    { _id: storyObjectId, ownerId: ownerObjectId },
     updateData,
     {
       new: true,
