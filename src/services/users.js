@@ -44,6 +44,7 @@ export const deleteSavedStory = async (userId, storyId) => {
     console.error('Error deleting saved story:', error);
     throw error;
   }
+};
 
 
 export const updateUserAvatar = async (userId, avatarUrl) => {
@@ -64,6 +65,7 @@ export const updateUserAvatar = async (userId, avatarUrl) => {
     throw error;
   }
 }
+
 
 
 export const getUserById = async (userId) => {
