@@ -1,6 +1,7 @@
 
-import { getAllUsers } from '../services/users.js';
+import { getAllUsers, updateUserAvatar } from '../services/users.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
+import { uploadImageToCloudinary } from '../services/cloudinary.js';
 
 export const getAllUsersController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -50,11 +51,34 @@ res.status(204).send();
 
 
 export const patchMeAvatarController = async (req, res) => {
+  const { user } = req;
   
-  res.json({
-    status: 200,
-    message: `Successfully patched a avatar!`,
+  if (!user || !user._id) {
+    return res.status(401).json({
+      status: 401,
+      message: 'Unauthorized',
+    });
+  }
 
+  if (!req.file) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Avatar file is required',
+    });
+  }
+
+  // Завантажуємо зображення в Cloudinary
+  const avatarUrl = await uploadImageToCloudinary(req.file);
+
+  // Оновлюємо аватар користувача в БД
+  const updatedUser = await updateUserAvatar(user._id, avatarUrl);
+
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully updated avatar!',
+    data: {
+      avatarUrl: updatedUser.avatarUrl,
+    },
   });
 };
 

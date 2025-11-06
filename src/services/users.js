@@ -1,5 +1,6 @@
 import { UsersCollection } from '../db/models/user.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
+import createHttpError from 'http-errors';
 
 export const getAllUsers = async ({ page = 1, perPage = 12 }) => {
   const limit = perPage;
@@ -24,6 +25,25 @@ export const getAllUsers = async ({ page = 1, perPage = 12 }) => {
     };
   } catch (error) {
     console.error('Error fetching users:', error);
+    throw error;
+  }
+};
+
+export const updateUserAvatar = async (userId, avatarUrl) => {
+  try {
+    const updatedUser = await UsersCollection.findByIdAndUpdate(
+      userId,
+      { avatarUrl },
+      { new: true, select: '-password' },
+    );
+
+    if (!updatedUser) {
+      throw createHttpError(404, 'User not found');
+    }
+
+    return updatedUser;
+  } catch (error) {
+    console.error('Error updating user avatar:', error);
     throw error;
   }
 };
