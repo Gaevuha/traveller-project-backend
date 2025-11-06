@@ -1,16 +1,9 @@
 import { Router } from 'express';
+import { getAllUsersController } from '../controllers/users.js';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 
 const router = Router();
 
-//публічні
-router.get('/'); // створити публічний ендпоінт на отримання даних про користувачів(авторів) + пагінація
-router.get('/:id'); // створити публічний ендпоінт на отримання даних про користувача за ID - дані користувача + список статей
-
-//Приватні
-router.get('/me/profile'); // створити приватний ендпоінт на отримання інформації про поточного користувача
-router.post('/me/saved/:storyId'); // створити приватний ендпоінт для додавання статті до збережених статей користувача
-router.delete('/me/saved/:storyId'); // створити приватний ендпоінт для видалення статті зі збережених статей користувача
-router.patch('/me/avatar'); // створити приватний ендпоінт для оновлення аватару корситувача
-router.patch('/me'); //створити приватний ендпоінт для оновлення даних користувача
+router.get('/', ctrlWrapper(getAllUsersController));
 
 export default router;
