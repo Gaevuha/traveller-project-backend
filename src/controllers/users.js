@@ -1,3 +1,5 @@
+
+import { getAllUsers } from '../services/users.js';
 import { getAllUsers, getUserById } from '../services/users.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
@@ -27,9 +29,11 @@ export const getUsersByIdController = async (req, res) => {
 };
 
 export const getMeProfileController = async (req, res) => {
+  user = req.user;
   res.status(200).json({
     status: 200,
-    message: ``,
+    message: `Successfully found the user with id: ${user.userId}`,
+    data: user,
   });
 };
 
