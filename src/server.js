@@ -7,8 +7,7 @@ import router from './routers/index.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import cookieParser from 'cookie-parser';
-import { UPLOAD_DIR } from './contacts/sortIndex.js';
-import { swaggerDocs } from './middlewares/swaggerDocs.js';
+
 
 dotenv.config();
 
@@ -37,9 +36,7 @@ export async function setupServer() {
   //Додаємо роутер як middleware
   app.use(router);
 
-  app.use('/uploads', express.static(UPLOAD_DIR));
-  app.use('/api-docs', swaggerDocs());
-
+  
   app.use((req, res) => {
     res.status(404).json({
       message: 'Not found',

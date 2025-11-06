@@ -1,36 +1,20 @@
 import { Router } from 'express';
-import { validateBody } from '../middlewares/validateBody.js';
-import {
-  loginUserController,
-  logoutUserController,
-  refreshUserSessionController,
-  registerUserController,
-} from '../controllers/auth.js';
-import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import { loginUserSchema, registerUserSchema, loginWithGoogleOAuthSchema } from '../validation/auth.js';
-import { requestResetEmailSchema } from '../validation/auth.js';
-import { requestResetEmailController } from '../controllers/auth.js';
-import { resetPasswordSchema } from '../validation/auth.js';
-import { resetPasswordController } from '../controllers/auth.js';
-import { getGoogleOAuthUrlController } from '../controllers/auth.js';
-import { loginWithGoogleController } from '../controllers/auth.js';
-
-
 
 const router = Router();
 
-router.post('/register', validateBody(registerUserSchema), ctrlWrapper(registerUserController));
-router.post(
-  '/login',
-  validateBody(loginUserSchema),
-  ctrlWrapper(loginUserController),
-);
-router.post('/logout', ctrlWrapper(logoutUserController));
-router.post('/refresh', ctrlWrapper(refreshUserSessionController));
-router.post('/send-reset-email', validateBody(requestResetEmailSchema), ctrlWrapper(requestResetEmailController));
-router.post('/reset-password', validateBody(resetPasswordSchema), ctrlWrapper(resetPasswordController));
-router.get('/get-oauth-url', ctrlWrapper(getGoogleOAuthUrlController));
-router.post('/confirm-oauth', validateBody(loginWithGoogleOAuthSchema), ctrlWrapper(loginWithGoogleController));
+//публічні
+router.post('/register'); // створити публічний ендпоінт реєстрації користувача
+router.post('/login'); // створити публічний ендпоінт логінізації користувача
+router.post('/refresh');// рефреш токен
+
+//приватні
+router.post('/logout'); // створити приватний ендпоінт для логаута користувача
+
+//додаткове завдання
+router.post('/send-reset-email');
+router.post('/reset-password');
+router.get('/get-oauth-url');
+router.post('/confirm-oauth');
 
 
 export default router;
