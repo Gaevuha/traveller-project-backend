@@ -31,6 +31,21 @@ export const getAllUsers = async ({ page = 1, perPage = 12 }) => {
 };
 
 
+export const deleteSavedStory = async (userId, storyId) => {
+  try {
+    const updatedUser = await UsersCollection.findByIdAndUpdate(
+      userId,
+      { $pull: { savedStories: storyId } },
+      { new: true }
+    ).populate('savedStories', '-__v');
+
+    return updatedUser;
+  } catch (error) {
+    console.error('Error deleting saved story:', error);
+    throw error;
+  }
+
+
 export const updateUserAvatar = async (userId, avatarUrl) => {
   try {
     const updatedUser = await UsersCollection.findByIdAndUpdate(

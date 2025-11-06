@@ -1,4 +1,8 @@
 import { Router } from 'express';
+
+
+
+import { deleteMeSavedStoriesController } from '../controllers/users.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import {
   createStoryController,
@@ -8,6 +12,7 @@ import {
 import { isValidId } from '../middlewares/isValidId.js';
 import { upload } from '../middlewares/multer.js';
 
+
 const router = Router();
 
 //публічний
@@ -15,11 +20,13 @@ router.get('/', ctrlWrapper(getAllStoriesController)); //створити пуб
 
 //приватний
 router.post('/', ctrlWrapper(createStoryController)); //створити приватний ендпоінт для СТВОРЕННЯ історії
+router.delete('saved-stories/:storyId', /*authenticate middleware*/ ctrlWrapper(deleteMeSavedStoriesController)) //роутер для удаления истории
 router.patch(
   '/:storyId',
   isValidId,
   upload.single('storyImage'),
   ctrlWrapper(patchStoryController),
 ); //створити приватний ендпоінт для РЕДАГУВАННЯ історії
+
 
 export default router;
