@@ -1,3 +1,4 @@
+import { TravellersCollection } from '../db/models/traveller.js';
 import { UsersCollection } from '../db/models/user.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import createHttpError from 'http-errors';
@@ -29,6 +30,7 @@ export const getAllUsers = async ({ page = 1, perPage = 12 }) => {
   }
 };
 
+
 export const updateUserAvatar = async (userId, avatarUrl) => {
   try {
     const updatedUser = await UsersCollection.findByIdAndUpdate(
@@ -46,4 +48,27 @@ export const updateUserAvatar = async (userId, avatarUrl) => {
     console.error('Error updating user avatar:', error);
     throw error;
   }
+
+export const getUserById = async (userId) => {
+  const user = await UsersCollection.findById(userId)
+    .select('_id name avatarUrl articlesAmount description createdAt')
+    .lean();
+
+  if (!user) {
+    const error = new Error('User not found');
+    error.status = 404;
+    throw error;
+  }
+
+  const articles = await TravellersCollection.find({ ownerId: userId })
+    .select('_id title img date favoriteCount')
+    .sort({ date: -1 })
+    .lean();
+
+  return {
+    user,
+    articles,
+    totalArticles: articles.length,
+  };
+
 };
