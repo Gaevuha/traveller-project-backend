@@ -32,3 +32,13 @@ export const createUserSchema = Joi.object({
     'any.required': 'Password is required',
   }),
 });
+
+export const UpdateUserSchema = Joi.object({
+  name: Joi.string().trim().min(3).max(20),
+  description: Joi.string().trim().min(5).max(3000),
+  avatarUrl: Joi.string()
+    .uri({ scheme: ['http', 'https'] })
+    .max(200),
+})
+  .min(1)
+  .unknown(false);

@@ -27,3 +27,17 @@ export const getAllUsers = async ({ page = 1, perPage = 12 }) => {
     throw error;
   }
 };
+
+export async function updateMe(userId, payload, options = {}) {
+  return UsersCollection.findOneAndUpdate(
+    { _id: userId },
+    { $set: payload },
+    {
+      new: true,
+      runValidators: true,
+      projection: '_id name description avatarUrl articlesAmount createdAt',
+      lean: true,
+      ...options,
+    },
+  );
+}
