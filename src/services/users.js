@@ -83,3 +83,21 @@ export const getUserById = async (userId) => {
   };
 
 };
+
+export const addArticleToSaved = async (userId, articleId) => {
+  const user = await UsersCollection.findById(userId);
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // перевіряємо, чи вже є стаття в списку
+  if (user.savedArticles.includes(articleId)) {
+    throw new Error('Article already saved');
+  }
+
+  user.savedArticles.push(articleId);
+  await user.save();
+
+  return user.savedArticles;
+};

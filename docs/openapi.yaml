@@ -7,6 +7,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 
+
 servers:
   - url: http://localhost:3000/api
     description: Local development server
@@ -20,6 +21,7 @@ tags:
     description: Authentication and authorization operations (login, logout, reset password)
 
 paths:
+
   /users:
     get:
       $ref: '../swagger/paths/users/get.yaml'

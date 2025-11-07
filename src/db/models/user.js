@@ -3,6 +3,7 @@ import { model, Schema } from 'mongoose';
 const usersSchema = new Schema(
   {
     name: { type: String, required: true },
+
     avatarUrl: { type: String },
     articlesAmount: { type: Number },
     description: { type: String },
@@ -15,6 +16,12 @@ const usersSchema = new Schema(
       ref: 'users',
     },
 
+    savedArticles: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'articles', // або 'traveller', якщо статті зберігаються там
+      },
+    ],
   },
 
   { timestamps: true, versionKey: false },
