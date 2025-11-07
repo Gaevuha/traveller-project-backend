@@ -21,7 +21,7 @@ const usersSchema = new Schema(
         type: Schema.Types.ObjectId,
         ref: 'articles', // або 'traveller', якщо статті зберігаються там
       },
-    ],
+    ], // почему не savedStory key?
   },
 
   { timestamps: true, versionKey: false },

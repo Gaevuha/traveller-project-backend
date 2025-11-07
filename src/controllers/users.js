@@ -50,36 +50,28 @@ export const createMeSavedStoriesController = async (req, res) => {
 };
 
 export const deleteMeSavedStoriesController = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const { storyId } = req.params;
+  const userId = req.user._id;
+  const { storyId } = req.params;
 
-    const updatedUser = await deleteSavedStory(userId, storyId);
+  const updatedUser = await deleteSavedStory(userId, storyId);
 
-    if (!updatedUser) {
-      return res.status(404).json({
-        status: 404,
-        message: 'User or saved story not found',
-      });
-    }
-
-    return res.status(200).json({
-      status: 200,
-      message: 'Successfully deleted saved story!',
-      data: updatedUser,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      status: 500,
-      message: 'Internal server error',
+  if (!updatedUser) {
+    return res.status(404).json({
+      status: 404,
+      message: 'User or saved story not found',
     });
   }
-};
+
+  return res.status(200).json({
+    status: 200,
+    message: 'Successfully deleted saved story!',
+    data: updatedUser,
+  });
+}
 
 export const patchMeAvatarController = async (req, res) => {
   const { user } = req;
-  
+
   if (!user || !user._id) {
     return res.status(401).json({
       status: 401,
