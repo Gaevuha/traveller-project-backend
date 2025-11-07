@@ -1,6 +1,10 @@
 
-import { getAllUsers } from '../services/users.js';
+
+import { getAllUsers, getUserById, updateUserAvatar} from '../services/users.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
+import { deleteSavedStory } from '../services/users.js';
+import { uploadImageToCloudinary } from '../services/cloudinary.js';
+
 
 export const getAllUsersController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -16,55 +20,100 @@ export const getAllUsersController = async (req, res) => {
     data: users,
   });
 };
-  
-  
+
 export const getUsersByIdController = async (req, res) => {
-    res.status(200).json({
+  const { userId } = req.params;
+  const data = await getUserById(userId);
+  res.status(200).json({
     status: 200,
     message: `Successfully found users with id!`,
+    data,
   });
 };
-
 
 export const getMeProfileController = async (req, res) => {
-    res.status(200).json({
+  const user = req.user;
+  res.status(200).json({
     status: 200,
-    message: ``,
+    message: `Successfully found the user with id: ${user.userId}`,
+    data: user,
   });
 };
 
-
 export const createMeSavedStoriesController = async (req, res) => {
-  
   res.status(201).json({
     status: 201,
     message: 'Successfully created a story!',
   });
 };
 
-
 export const deleteMeSavedStoriesController = async (req, res) => {
-  
-res.status(204).send();
+  try {
+    const userId = req.user._id;
+    const { storyId } = req.params;
+
+    const updatedUser = await deleteSavedStory(userId, storyId);
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        status: 404,
+        message: 'User or saved story not found',
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Successfully deleted saved story!',
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: 500,
+      message: 'Internal server error',
+    });
+  }
 };
 
-
 export const patchMeAvatarController = async (req, res) => {
+  const { user } = req;
   
-  res.json({
+  if (!user || !user._id) {
+    return res.status(401).json({
+      status: 401,
+      message: 'Unauthorized',
+    });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Avatar file is required',
+    });
+  }
+
+  // Завантажуємо зображення в Cloudinary
+  const avatarUrl = await uploadImageToCloudinary(req.file);
+
+  // Оновлюємо аватар користувача в БД
+  const updatedUser = await updateUserAvatar(user._id, avatarUrl);
+
+  res.status(200).json({
     status: 200,
-    message: `Successfully patched a avatar!`,
+    message: 'Successfully updated avatar!',
+    data: {
+      avatarUrl: updatedUser.avatarUrl,
+    },
 
   });
 };
 
-
 export const patchMeController = async (req, res) => {
-  
   res.json({
     status: 200,
     message: `Successfully patched my profile!`,
-
   });
+
 };
+
 

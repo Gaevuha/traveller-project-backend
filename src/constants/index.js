@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { getEnvVar } from '../utils/getEnvVar.js';
+export const SWAGGER_PATH = path.join(process.cwd(), 'docs', 'swagger.json');
 
 export const SORT_ORDER = {
   ASC: 'asc',
@@ -8,6 +8,12 @@ export const SORT_ORDER = {
 
 export const FIFTEEN_MINUTES = 15 * 60 * 1000;
 export const ONE_DAY = 24 * 60 * 60 * 1000;
+
+export const CLOUDINARY = {
+  CLOUD_NAME: 'CLOUDINARY_CLOUD_NAME',
+  API_KEY: 'CLOUDINARY_API_KEY',
+  API_SECRET: 'CLOUDINARY_API_SECRET',
+};
 
 export const SMTP = {
   SMTP_HOST: 'SMTP_HOST',
@@ -22,10 +28,5 @@ export const TEMPLATES_DIR = path.join(process.cwd(), 'src', 'templates');
 export const TEMP_UPLOAD_DIR = path.join(process.cwd(), 'temp');
 export const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
-export const CLOUDINARY = {
-  CLOUDINARY_CLOUD_NAME: getEnvVar('CLOUDINARY_CLOUD_NAME'),
-  CLOUDINARY_API_KEY: getEnvVar('CLOUDINARY_API_KEY'),
-  CLOUDINARY_API_SECRET: getEnvVar('CLOUDINARY_API_SECRET'),
-};
+export const TEMP_UPLOAD_DIR = path.join(process.cwd(), 'temp');
 
-export const SWAGGER_PATH = path.join(process.cwd(), 'docs', 'swagger.json');

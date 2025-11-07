@@ -1,9 +1,12 @@
+
 import { Schema, model } from 'mongoose';
+
 
 const sessionSchema = new Schema(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'users',
       required: true,
     },
     accessToken: {
@@ -14,18 +17,24 @@ const sessionSchema = new Schema(
       type: String,
       required: true,
     },
-    accessTokenValidUntil: {
-      type: Date,
+
+    accessTokenValidUntill: {
+      type: String,
       required: true,
     },
-    refreshTokenValidUntil: {
-      type: Date,
+    refreshTokenValidUntill: {
+      type: String,
       required: true,
     },
   },
   {
     timestamps: true,
+
+    versionKey: false,
   },
 );
 
-export const SessionsCollection = model('Session', sessionSchema);
+const SessionsCollection = model('sessions', sessionSchema);
+
+export default SessionsCollection;
+

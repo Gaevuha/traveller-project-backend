@@ -7,12 +7,14 @@ const usersSchema = new Schema(
     articlesAmount: { type: Number },
     description: { type: String },
 
+
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'users',
     },
+
   },
 
   { timestamps: true, versionKey: false },
