@@ -1,4 +1,6 @@
-import { model, Schema } from 'mongoose';
+
+import { Schema, model } from 'mongoose';
+
 
 const sessionSchema = new Schema(
   {
@@ -15,6 +17,7 @@ const sessionSchema = new Schema(
       type: String,
       required: true,
     },
+
     accessTokenValidUntill: {
       type: String,
       required: true,
@@ -26,6 +29,7 @@ const sessionSchema = new Schema(
   },
   {
     timestamps: true,
+
     versionKey: false,
   },
 );
@@ -33,3 +37,4 @@ const sessionSchema = new Schema(
 const SessionsCollection = model('sessions', sessionSchema);
 
 export default SessionsCollection;
+
