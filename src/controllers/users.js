@@ -1,11 +1,14 @@
-
 import createHttpError from 'http-errors';
 import * as usersService from '../services/users.js';
-import { getAllUsers, getUserById, updateUserAvatar, updateMe} from '../services/users.js';
+import {
+  getAllUsers,
+  getUserById,
+  updateUserAvatar,
+  updateMe,
+} from '../services/users.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { deleteSavedStory } from '../services/users.js';
 import { uploadImageToCloudinary } from '../services/cloudinary.js';
-
 
 export const getAllUsersController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -67,20 +70,20 @@ export const deleteMeSavedStoriesController = async (req, res) => {
     message: 'Successfully deleted saved story!',
     data: updatedUser,
   });
-}
+};
 
 export const patchMeController = async (req, res, next) => {
   const userId = req.user?._id || req.user?.id;
-  const user = await updateMe(userId, req.body);
+  const updatedUser = await updateMe(userId, req.body);
 
-  if (!user) {
+  if (!updatedUser) {
     return next(createHttpError(404, 'User not found'));
   }
 
   res.json({
     status: 200,
     message: `Successfully patched my profile!`,
-    data: user,
+    data: updatedUser,
   });
 };
 
@@ -115,7 +118,6 @@ export const patchMeAvatarController = async (req, res) => {
     },
   });
 };
-
 
 export const addSavedArticle = async (req, res) => {
   try {
