@@ -37,7 +37,7 @@ export const getMeProfileController = async (req, res) => {
   const user = req.user;
   res.status(200).json({
     status: 200,
-    message: `Successfully found the user with id: ${user.userId}`,
+    message: `Successfully found the user with id: ${user._id}`,
     data: user,
   });
 };
