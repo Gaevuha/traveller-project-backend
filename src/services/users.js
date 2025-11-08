@@ -23,9 +23,9 @@ export const deleteSavedStory = async (userId, storyId) => {
   try {
     const updatedUser = await UsersCollection.findByIdAndUpdate(
       userId,
-      { $pull: { savedArticles: storyId } }, // исправил savedArticles было savedStory
+      { $pull: { articles: storyId } }, // исправил articles было savedArticles
       { new: true },
-    ).populate('savedArticles', '-__v'); // исправил savedArticles было savedStory
+    ).populate('articles', '-__v'); // articles было savedArticles
 
     return updatedUser;
   } catch (error) {
