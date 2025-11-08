@@ -13,7 +13,7 @@ export const getAllStories = async (query) => {
     TravellersCollection.find(filter)
       .populate('category', 'name')
       .populate('ownerId')
-      .sort({ date: -1 })
+      .sort({favoriteCount:  - 1, date: - 1})
       .skip(skip)
       .limit(perPage),
     TravellersCollection.countDocuments(filter),
