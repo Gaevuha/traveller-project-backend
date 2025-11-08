@@ -11,7 +11,7 @@ const usersSchema = new Schema(
     email: { type: String, unique: true },
     password: { type: String },
 
-    savedStory: {
+    articles: {
       type: [{ type: Schema.Types.ObjectId, ref: 'travellers' }],
       default: [],
     },
