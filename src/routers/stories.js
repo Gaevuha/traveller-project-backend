@@ -20,11 +20,11 @@ const router = Router();
 router.get('/', ctrlWrapper(getAllStoriesController)); //створити публічний ендпоінт для ОТРИМАННЯ історій + пагінація + фільтрація за категоріями
 
 //приватний
+router.use(authenticate);
 router.post('/', ctrlWrapper(createStoryController)); //створити приватний ендпоінт для СТВОРЕННЯ історії
 router.delete('saved-stories/:storyId', /*authenticate middleware*/ ctrlWrapper(deleteMeSavedStoriesController)) //роутер для удаления истории
 router.patch(
   '/:storyId',
-  authenticate,
   isValidId,
   upload.single('storyImage'),
   ctrlWrapper(patchStoryController),
