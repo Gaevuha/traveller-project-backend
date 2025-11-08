@@ -40,12 +40,13 @@ export async function updateMe(userId, payload, options = {}) {
     { $set: payload },
     {
       new: true,
+      returnDocument: 'after',
       runValidators: true,
-      projection: '_id name description avatarUrl articlesAmount createdAt',
-      lean: true,
       ...options,
     },
-  );
+  )
+    .select('_id name description avatarUrl articlesAmount createdAt')
+    .lean();
 }
 
 export const updateUserAvatar = async (userId, avatarUrl) => {
