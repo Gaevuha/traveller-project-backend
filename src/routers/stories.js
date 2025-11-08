@@ -22,7 +22,7 @@ router.get('/', ctrlWrapper(getAllStoriesController)); //створити пуб
 //приватний
 router.use(authenticate);
 router.post('/', ctrlWrapper(createStoryController)); //створити приватний ендпоінт для СТВОРЕННЯ історії
-router.delete('saved-stories/:storyId', /*authenticate middleware*/ ctrlWrapper(deleteMeSavedStoriesController)) //роутер для удаления истории
+router.delete('/saved-stories/:storyId', ctrlWrapper(deleteMeSavedStoriesController)) //роутер для удаления истории
 router.patch(
   '/:storyId',
   isValidId,
