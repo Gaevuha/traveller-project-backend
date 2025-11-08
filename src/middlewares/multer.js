@@ -1,6 +1,11 @@
 import multer from 'multer';
+import fs from 'node:fs';
 import { TEMP_UPLOAD_DIR } from '../constants/index.js';
 import createHttpError from 'http-errors';
+
+if (!fs.existsSync(TEMP_UPLOAD_DIR)) {
+  fs.mkdirSync(TEMP_UPLOAD_DIR, { recursive: true });
+}
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
