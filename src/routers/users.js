@@ -12,6 +12,8 @@ import {
   addSavedArticle,
 } from '../controllers/users.js';
 import { authenticate } from '../middlewares/authenticate.js';
+import { validateBody } from '../middlewares/validateBody.js';
+import { UpdateUserSchema } from '../validation/user.js';
 
 
 const router = Router();
@@ -26,6 +28,6 @@ router.get('/me/profile', ctrlWrapper(getMeProfileController)); // створи�
 router.post('/me/saved/:storyId', ctrlWrapper(addSavedArticle)); // створити приватний ендпоінт для додавання статті до збережених статей користувача
 router.delete('/me/saved/:storyId', ctrlWrapper(deleteMeSavedStoriesController)); // створити приватний ендпоінт для видалення статті зі збережених статей користувача
 router.patch('/me/avatar', uploadAvatar, ctrlWrapper(patchMeAvatarController)); // створити приватний ендпоінт для оновлення аватару корситувача
-router.patch('/me', ctrlWrapper(patchMeController)); //створити приватний ендпоінт для оновлення даних користувача
+router.patch('/me', validateBody(UpdateUserSchema), ctrlWrapper(patchMeController)); //створити приватний ендпоінт для оновлення даних користувача
 
 export default router;
