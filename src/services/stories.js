@@ -1,4 +1,3 @@
-
 import { TravellersCollection } from '../db/models/traveller.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
@@ -29,7 +28,6 @@ export const getAllStories = async (query) => {
   };
 };
 
-
 export async function updateStoryById(
   storyId,
   ownerId,
@@ -41,7 +39,7 @@ export async function updateStoryById(
 
   if (storyImageFile) {
     const photoUrl = await saveFileToCloudinary(storyImageFile);
-    updateData.storyImage = photoUrl;
+    updateData.img = photoUrl;
   }
 
   const storyObjectId = new mongoose.Types.ObjectId(storyId);

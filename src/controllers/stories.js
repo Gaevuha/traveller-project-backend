@@ -1,7 +1,5 @@
-
 import updateStorySchema from '../validation/traveller.js';
 import { getAllStories, updateStoryById } from '../services/stories.js';
-
 
 import { checkCategoryExists } from '../services/categories.js';
 import createHttpError from 'http-errors';
@@ -16,8 +14,6 @@ export const getAllStoriesController = async (req, res) => {
     ...result,
   });
 };
-
-
 
 export const createStoryController = async (req, res) => {
   res.status(201).json({
@@ -37,7 +33,7 @@ export const patchStoryController = async (req, res) => {
     if (storyImageFile) {
       await fs.unlink(storyImageFile.path);
     }
-    throw createHttpError(400, 'Validation error');
+    throw createHttpError(400, error.details[0].message);
   }
 
   if (updateFields.category) {
@@ -72,5 +68,6 @@ export const patchStoryController = async (req, res) => {
   res.json({
     status: 200,
     message: `Successfully patched a story!`,
+    data: updatedStory,
   });
 };

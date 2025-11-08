@@ -42,8 +42,6 @@ const updateStorySchema = Joi.object({
       'any.invalid': 'Category must be a valid category ID',
     })
     .optional(),
-
-  storyImage: Joi.string().optional(),
-}).or('title', 'article', 'category', 'img');
+}).or('title', 'article', 'category');
 
 export default updateStorySchema;
