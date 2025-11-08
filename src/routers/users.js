@@ -13,13 +13,13 @@ import {
 
 import { authenticate } from '../middlewares/authenticate.js';
 const router = Router();
-router.use(authenticate);
+
 //публічні
 router.get('/', ctrlWrapper(getAllUsersController));
 router.get('/:userId', ctrlWrapper(getUsersByIdController)); // створити публічний ендпоінт на отримання даних про користувача за ID - дані користувача + список статей
 
 //Приватні
-// router.use(authenticate);
+router.use(authenticate);
 router.get('/me/profile', authenticate, ctrlWrapper(getMeProfileController)); // створити приватний ендпоінт на отримання інформації про поточного користувача
 router.post('/me/saved/:storyId', ctrlWrapper(createMeSavedStoriesController)); // створити приватний ендпоінт для додавання статті до збережених статей користувача
 
