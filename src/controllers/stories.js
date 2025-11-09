@@ -28,27 +28,32 @@ export const patchStoryController = async (req, res) => {
   const updateFields = req.body;
   const storyImageFile = req.file;
 
-  const { error } = updateStorySchema.validate(updateFields);
-  if (error) {
-    if (storyImageFile) {
-      await fs.unlink(storyImageFile.path);
+  const hasUpdates = Object.keys(updateFields).length > 0 || storyImageFile;
+  if (!hasUpdates) {
+    throw createHttpError(400, 'There are no fields to update.');
+  }
+
+  if (Object.keys(updateFields).length > 0) {
+    const { error } = updateStorySchema.validate(updateFields);
+    if (error) {
+      if (storyImageFile) {
+        await fs.unlink(storyImageFile.path);
+      }
+      throw createHttpError(400, error.details[0].message);
     }
-    throw createHttpError(400, error.details[0].message);
   }
 
   if (updateFields.category) {
     const categoryExists = await checkCategoryExists(updateFields.category);
     if (!categoryExists) {
+      if (storyImageFile) {
+        await fs.unlink(storyImageFile.path);
+      }
       throw createHttpError(
         400,
         `Category with ID ${updateFields.category} not found.`,
       );
     }
-  }
-
-  const hasUpdates = Object.keys(updateFields).length > 0 || storyImageFile;
-  if (!hasUpdates) {
-    throw createHttpError(400, 'There are no fields to update.');
   }
 
   const updatedStory = await updateStoryById(
