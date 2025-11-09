@@ -4,7 +4,9 @@ const usersSchema = new Schema(
   {
     name: { type: String, required: true },
 
-    avatarUrl: { type: String },
+    avatarUrl: { type: String,
+    default: "https://res.cloudinary.com/dcyt4kr5s/image/upload/v1762684805/avatars/ycozq7nun3lbze83tjsk.png" },
+
     articlesAmount: { type: Number, default: 0 },
     description: { type: String },
 
