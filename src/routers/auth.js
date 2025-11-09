@@ -17,39 +17,22 @@ import {
   loginWithGoogleOAuthSchema,
 } from '../validation/auth.js';
 import { validateBody } from '../middlewares/validateBody.js';
+import { authenticate } from '../middlewares/authenticate.js';
+
 
 const authRouter = Router();
 
-authRouter.post(
-  '/register',
-  validateBody(registerUserSchema),
-  registerUserController,
-);
-
+//Публічні
+authRouter.post('/register', validateBody(registerUserSchema), registerUserController);
 authRouter.post('/login', validateBody(loginUserSchema), loginUserController);
-
-authRouter.post('/logout', logoutUserController);
-
 authRouter.post('/refresh', refreshUserSessionController);
-
-authRouter.post(
-  '/send-reset-email',
-  validateBody(requestResetEmailSchema),
-  sendResetEmailController,
-);
-
-authRouter.post(
-  '/reset-password',
-  validateBody(resetPasswordSchema),
-  resetPasswordController,
-);
-
+authRouter.post('/send-reset-email',validateBody(requestResetEmailSchema),sendResetEmailController);
+authRouter.post('/reset-password', validateBody(resetPasswordSchema), resetPasswordController);
 authRouter.get('/google/get-oauth-url', getGoogleOAuthUrlController);
-
-authRouter.post(
-  '/google/confirm-oauth',
-  validateBody(loginWithGoogleOAuthSchema),
-  loginWithGoogleOAuthController,
+authRouter.post('/google/confirm-oauth', validateBody(loginWithGoogleOAuthSchema), loginWithGoogleOAuthController,
 );
+
+//Приватні
+authRouter.post('/logout', authenticate, logoutUserController);
 
 export default authRouter;

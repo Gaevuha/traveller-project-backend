@@ -114,6 +114,7 @@ export const addArticleToSaved = async (userId, storyId) => {
 
   const updatedUser = await UsersCollection.findByIdAndUpdate(
   userId,
+  { _id: userId },
   { $addToSet: { articles: storyId } },
   { new: true, select: '+articles' }
 );
