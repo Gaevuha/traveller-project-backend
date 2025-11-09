@@ -6,6 +6,8 @@ export const SORT_ORDER = {
   DESC: 'desc',
 };
 
+export const emailRegexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export const accessTokenLifeTime = 1000 * 60 * 15; // 15 хвилин
 export const refreshTokenLifeTime = 1000 * 60 * 60 * 24 * 7; // 7 днів
 

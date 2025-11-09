@@ -10,7 +10,7 @@ import { getFullNameFromGoogleTokenPayload, validateCode } from '../utils/google
 import { accessTokenLifeTime, refreshTokenLifeTime } from '../constants/index.js';
 import { SMTP, TEMPLATES_DIR } from '../constants/index.js';
 import { SessionsCollection } from '../db/models/session.js';
-import { UserCollection } from '../db/models/user.js';
+import { UsersCollection } from '../db/models/user.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
 import { sendEmail } from '../utils/sendEmail.js';
 
@@ -22,7 +22,7 @@ const createSession = () => ({
 });
 
 export const findSession = (query) => SessionsCollection.findOne(query);
-export const findUser = (query) => UserCollection.findOne(query);
+export const findUser = (query) => UsersCollection.findOne(query);
 
 const jwtSecret = getEnvVar('JWT_SECRET');
 const appDomain = getEnvVar('APP_DOMAIN');
@@ -31,12 +31,11 @@ const appDomain = getEnvVar('APP_DOMAIN');
 export const registerUser = async (data) => {
   const { email } = data;
 
-  const existingUser = await UserCollection.findOne({ email });
+  const existingUser = await UsersCollection.findOne({ email });
   if (existingUser) throw createHttpError(409, 'Email already in use');
 
   // НЕ хэшируем здесь — это сделает pre('save') хук
-  const newUser = await UserCollection.create(data);
-
+  const newUser = await UsersCollection.create(data);
   return {
     id: newUser._id,
     name: newUser.name,
@@ -46,7 +45,7 @@ export const registerUser = async (data) => {
 
 /** Login */
 export const loginUser = async ({ email, password }) => {
-  const user = await UserCollection.findOne({ email });
+  const user = await UsersCollection.findOne({ email });
   if (!user) throw createHttpError(401, 'User not found');
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -85,7 +84,7 @@ export const logoutUser = async (sessionId) => {
 
 /** Send password reset email */
 export const sendResetToken = async (email) => {
-  const user = await UserCollection.findOne({ email });
+  const user = await UsersCollection.findOne({ email });
   if (!user) throw createHttpError(404, 'User not found');
 
   const resetToken = jwt.sign({ sub: user._id, email }, jwtSecret, { expiresIn: '15m' });
@@ -126,11 +125,11 @@ export const resetPassword = async ({ token, password }) => {
     throw createHttpError(401, 'Invalid or expired reset token');
   }
 
-  const user = await UserCollection.findOne({ _id: payload.sub, email: payload.email });
+  const user = await UsersCollection.findOne({ _id: payload.sub, email: payload.email });
   if (!user) throw createHttpError(404, 'User not found');
 
   const newPasswordHash = await bcrypt.hash(password, 10);
-  await UserCollection.updateOne({ _id: user._id }, { password: newPasswordHash });
+  await UsersCollection.updateOne({ _id: user._id }, { password: newPasswordHash });
 };
 
 /** Google OAuth */
@@ -144,7 +143,7 @@ export const loginWithGoogleOAuth = async (code) => {
     const name = getFullNameFromGoogleTokenPayload(payload);
     const plainPassword = randomBytes(10).toString('base64');
 
-    user = await UserCollection.create({
+    user = await UsersCollection.create({
       name,
       email: payload.email,
       password: plainPassword,
