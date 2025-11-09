@@ -22,7 +22,7 @@ const multerUpload = multer({
   limits: {
     fileSize: MAX_FILE_SIZE,
   },
-}).single('avatar');
+}).single('avatarUrl');
 
 export const uploadAvatar = (req, res, next) => {
   multerUpload(req, res, (err) => {

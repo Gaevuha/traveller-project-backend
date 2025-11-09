@@ -47,5 +47,5 @@ export const UpdateUserSchema = Joi.object({
     .uri({ scheme: ['http', 'https'] })
     .max(200),
 })
-  .min(1)
+  .min(0)
   .unknown(false);
