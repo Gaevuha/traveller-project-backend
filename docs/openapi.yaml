@@ -44,11 +44,21 @@ paths:
       $ref: '../swagger/paths/auth/reset-pwd.yaml'
   /auth/send-reset-email:
     post:
-      $ref: '../swagger/paths/auth/send-reset-email.yaml'
+      $ref: '../swagger/paths/auth/send-reset-email.yaml'  
+  /auth/authgoogle:
+    get:
+      $ref: '../swagger/paths/auth/authgoogle/get.yaml'
+
+  /auth/authgoogle/redirect:
+    get:
+      $ref: '../swagger/paths/auth/authgoogle/redirect.get.yaml'
 
   /stories:
     get:
       $ref: '../swagger/paths/stories/get.yaml'
+      post:
+    $ref: '../swagger/paths/stories/post.yaml'
+
 
   /stories/{storyId}:
     patch:
