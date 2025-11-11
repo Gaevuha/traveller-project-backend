@@ -16,15 +16,29 @@ import { UsersCollection } from '../db/models/user.js';
 // GET ALL USERS (PUBLIC)
 export const getAllUsersController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
-  const users = await getAllUsers({
-    page,
-    perPage,
-  });
+
+  const {
+    data: users,
+    page: _page,
+    perPage: _perPage,
+    totalItems,
+    totalPages,
+    hasPreviousPage,
+    hasNextPage,
+  } = await getAllUsers({ page, perPage });
 
   res.status(200).json({
     status: 200,
     message: 'Successfully found users!',
-    data: users,
+    data: {
+      users,
+      page: _page,
+      perPage: _perPage,
+      totalItems,
+      totalPages,
+      hasPreviousPage,
+      hasNextPage,
+    },
   });
 };
 
