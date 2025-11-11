@@ -19,7 +19,18 @@ tags:
   - name: Stories
     description: Operations related to managing travel stories (CRUD, images, categories)
 
+
 paths:
+
+  /auth/register:
+    post:
+      $ref: '../swagger/paths/auth/register.yaml'
+
+  /auth/login:
+    post:
+      $ref: '../swagger/paths/auth/login.yaml'
+
+
   /users:
     get:
       $ref: '../swagger/paths/users/get.yaml'
@@ -66,12 +77,9 @@ paths:
 #     patch:
 #       $ref: '../swagger/paths/users/me/patch.yaml'
 
-  # /auth/login:
-  #   post:
-  #     $ref: '../swagger/paths/auth/login.yaml'
-  # /auth/register:
-  #   post:
-  #     $ref: '../swagger/paths/auth/register.yaml'
+
+
+
   # /auth/logout:
   #   post:
   #     $ref: '../swagger/paths/auth/logout.yaml'
