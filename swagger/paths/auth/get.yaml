@@ -1,0 +1,79 @@
+tags:
+  - Auth
+summary: Sign in with Google
+description:
+  Returns a Google OAuth 2.0 authorization URL that the frontend should use
+  to redirect the user for authentication.
+operationId: authGoogle
+security: []
+
+responses:
+  '200':
+    description: OAuth URL successfully generated
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message, data]
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully generated Google OAuth URL
+            data:
+              type: object
+              required: [url]
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  example: https://accounts.google.com/o/oauth2/v2/auth?client_id=1234567890.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fapp.example.com%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=openid%20email%20profile&state=abc123
+        examples:
+          success:
+            value:
+              status: 200
+              message: Successfully generated Google OAuth URL
+              data:
+                url: https://accounts.google.com/o/oauth2/v2/auth?client_id=1234567890.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fapp.example.com%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=openid%20email%20profile&state=abc123
+
+  '400':
+    description: Invalid configuration or failed to generate URL
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 400
+            message:
+              type: string
+              example: Invalid OAuth configuration
+        examples:
+          badConfig:
+            value:
+              status: 400
+              message: Invalid OAuth configuration
+
+  '500':
+    description: Internal server error
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 500
+            message:
+              type: string
+              example: Unexpected error while generating OAuth URL
+        examples:
+          serverError:
+            value:
+              status: 500
+              message: Unexpected error while generating OAuth URL

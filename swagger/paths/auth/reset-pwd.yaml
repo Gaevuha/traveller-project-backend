@@ -2,16 +2,72 @@ tags:
   - Auth
 summary: Reset password
 operationId: resetPassword
-description: Reset the user's password using a token from email
+description: Resets the user's password using a valid reset token issued via the reset-email flow.
 security: []
 requestBody:
   required: true
   content:
     application/json:
       schema:
-        $ref: '../../components/schemas/resetPassword.yaml'
+        type: object
+        required: [token, password]
+        properties:
+          token:
+            type: string
+            description: Password reset token received via email.
+            example: abc123resetToken
+          password:
+            type: string
+            description: New password that meets the password policy.
+            example: newStrongPassword1!
+
 responses:
   '200':
-    $ref: '../../components/responses/200-resetPwd.yaml'
-  '404':
-    $ref: '../../components/responses/404-user.yaml'
+    description: Password successfully reset
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Password has been reset successfully
+        examples:
+          success:
+            value:
+              status: 200
+              message: Password has been reset successfully
+
+  '400':
+    description: Invalid payload or expired/invalid reset token
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 400
+            message:
+              type: string
+              example: Invalid or expired reset token
+        examples:
+          invalidToken:
+            value:
+              status: 400
+              message: Invalid or expired reset token
+          weakPassword:
+            value:
+              status: 400
+              message: Password does not meet requirements
+
+  '401':
+    $ref: ../../components/responses/401.yaml
+
+  '500':
+    $ref: ../../components/responses/500.yaml

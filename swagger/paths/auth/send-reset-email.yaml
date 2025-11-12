@@ -2,16 +2,74 @@ tags:
   - Auth
 summary: Request password reset
 operationId: requestResetEmail
-description: Send password reset email to the user
+description: Sends a password reset email to the user.
+  The email contains a unique token used to reset the password.
 security: []
 requestBody:
   required: true
   content:
     application/json:
       schema:
-        $ref: '../../components/schemas/requestResetEmail.yaml'
+        type: object
+        required: [email]
+        properties:
+          email:
+            type: string
+            format: email
+            example: user@gmail.com
+
 responses:
   '200':
-    $ref: '../../components/responses/200-resetEmail.yaml'
+    description: Password reset email sent successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Password reset email sent
+        examples:
+          success:
+            value:
+              status: 200
+              message: Password reset email sent
+
   '404':
-    $ref: '../../components/responses/404-user.yaml'
+    description: User not found
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 404
+            message:
+              type: string
+              example: User not found
+        examples:
+          notFound:
+            value:
+              status: 404
+              message: User not found
+
+  '500':
+    description: Failed to send email
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 500
+            message:
+              type: string
+              example: Failed to send password reset email

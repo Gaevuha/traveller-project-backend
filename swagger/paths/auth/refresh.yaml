@@ -2,14 +2,79 @@ tags:
   - Auth
 summary: Refresh access token
 operationId: refreshUserSession
-description: Refresh access token using a valid refresh token
+description: Refresh the user's access token using a valid refresh token.
+  Returns a new pair of `accessToken` and `refreshToken`.
+  This endpoint does **not** require Authorization header, only a valid refresh token in the body.
 security: []
 requestBody:
   required: true
   content:
     application/json:
       schema:
-        $ref: '../../components/schemas/refreshToken.yaml'
+        type: object
+        required: [refreshToken]
+        properties:
+          refreshToken:
+            type: string
+            description: The refresh token obtained during login.
+            example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
 responses:
   '200':
-    $ref: '../../components/responses/200-refresh.yaml'
+    description: Tokens successfully refreshed
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message, data]
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully refreshed tokens
+            data:
+              type: object
+              required: [accessToken, refreshToken]
+              properties:
+                accessToken:
+                  type: string
+                  example: newAccessToken123
+                refreshToken:
+                  type: string
+                  example: newRefreshToken456
+        examples:
+          success:
+            value:
+              status: 200
+              message: Successfully refreshed tokens
+              data:
+                accessToken: newAccessToken123
+                refreshToken: newRefreshToken456
+
+  '400':
+    description: Missing or invalid refresh token
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 400
+            message:
+              type: string
+              example: Invalid or missing refresh token
+        examples:
+          invalid:
+            value:
+              status: 400
+              message: Invalid or missing refresh token
+
+  '401':
+    $ref: ../../components/responses/401.yaml
+
+  '500':
+    $ref: ../../components/responses/500.yaml

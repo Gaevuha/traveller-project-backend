@@ -2,9 +2,54 @@ tags:
   - Auth
 summary: Logout user
 operationId: logoutUser
-description: Log out user and invalidate access token
+description: Logs out the current user and invalidates their access token.
+  Requires a valid bearer token in the Authorization header.
 security:
   - bearerAuth: []
+
 responses:
-  '204':
-    $ref: '../../components/responses/204.yaml'
+  '200':
+    description: Successfully logged out
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully logged out
+        examples:
+          success:
+            value:
+              status: 200
+              message: Successfully logged out
+
+  '400':
+    description: Invalid or missing token format
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 400
+            message:
+              type: string
+              example: Invalid Authorization header
+        examples:
+          badRequest:
+            value:
+              status: 400
+              message: Invalid Authorization header
+
+  '401':
+    $ref: ../../components/responses/401.yaml
+
+  '500':
+    $ref: ../../components/responses/500.yaml
