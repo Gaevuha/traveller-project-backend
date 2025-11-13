@@ -12,6 +12,11 @@ export const getAllStories = async (query) => {
   const filter = parseFilterParams(query);
   const skip = (page - 1) * perPage;
 
+  
+    if (query.excludeId && mongoose.isValidObjectId(query.excludeId)) {
+    filter._id = { $ne: new mongoose.Types.ObjectId(query.excludeId) };
+  }
+
   const [stories, total] = await Promise.all([
     TravellersCollection.find(filter)
       .populate('category', 'name')
