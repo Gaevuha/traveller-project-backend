@@ -1,29 +1,26 @@
 tags:
   - Auth
-summary: Login user
-operationId: loginUser
-description: Authenticate a user and return access and refresh tokens.
+summary: Sign in with Google (callback)
+operationId: authGoogleRedirect
+description: Completes Google OAuth 2.0 login or registration.
+  Accepts the authorization `code` obtained from Google and returns access and refresh tokens.
 security: []
-
 requestBody:
   required: true
   content:
     application/json:
       schema:
         type: object
-        required: [email, password]
+        required: [code]
         properties:
-          email:
+          code:
             type: string
-            format: email
-            example: user@gmail.com
-          password:
-            type: string
-            example: qwerty12345
+            description: Authorization code received from Google after user consent.
+            example: 4/0AdDMEyExampleOAuthCode
 
 responses:
   '200':
-    description: Successfully logged in
+    description: Successfully authenticated with Google
     content:
       application/json:
         schema:
@@ -35,7 +32,7 @@ responses:
               example: 200
             message:
               type: string
-              example: Successfully logged in
+              example: Successfully logged in with Google
             data:
               type: object
               required: [accessToken, refreshToken, user]
@@ -61,7 +58,7 @@ responses:
           success:
             value:
               status: 200
-              message: Successfully logged in
+              message: Successfully logged in with Google
               data:
                 accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
                 refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -70,7 +67,7 @@ responses:
                   email: user@gmail.com
 
   '400':
-    description: Invalid request body
+    description: Invalid or expired Google OAuth code
     content:
       application/json:
         schema:
@@ -82,12 +79,12 @@ responses:
               example: 400
             message:
               type: string
-              example: 'email and password are required'
+              example: Invalid or expired Google OAuth code
         examples:
-          missingFields:
+          invalidCode:
             value:
               status: 400
-              message: 'email and password are required'
+              message: Invalid or expired Google OAuth code
 
   '401':
     $ref: ../../components/responses/401.yaml

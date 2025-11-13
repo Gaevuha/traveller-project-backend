@@ -2,16 +2,106 @@ tags:
   - Auth
 summary: Register a new user
 operationId: registerUser
-description: Create a new user account
+description: Registers a new user with name, email, and password.
+  Returns the created user record upon success.
 security: []
 requestBody:
   required: true
   content:
     application/json:
       schema:
-        $ref: '../../components/schemas/registerUser.yaml'
+        type: object
+        required: [name, email, password]
+        properties:
+          name:
+            type: string
+            example: Sarah Michelle Gellar
+          email:
+            type: string
+            format: email
+            example: sarah@gmail.com
+          password:
+            type: string
+            example: qwerty12345
+
 responses:
   '201':
-    $ref: ../../components/responses/201-register.yaml
+    description: User successfully registered
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message, data]
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: Successfully registered a new user!
+            data:
+              type: object
+              required: [_id, name, email]
+              properties:
+                _id:
+                  type: string
+                  example: 65e4decdd286b30065d54af9
+                name:
+                  type: string
+                  example: Sarah Michelle Gellar
+                email:
+                  type: string
+                  format: email
+                  example: sarah@gmail.com
+        examples:
+          success:
+            value:
+              status: 201
+              message: Successfully registered a new user!
+              data:
+                _id: 65e4decdd286b30065d54af9
+                name: Sarah Michelle Gellar
+                email: sarah@gmail.com
+
+  '400':
+    description: Invalid registration data
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 400
+            message:
+              type: string
+              example: Invalid email or password format
+        examples:
+          invalid:
+            value:
+              status: 400
+              message: Invalid email or password format
+
   '409':
-    $ref: '../../components/responses/409.yaml'
+    description: User already exists
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message]
+          properties:
+            status:
+              type: integer
+              example: 409
+            message:
+              type: string
+              example: Email already in use
+        examples:
+          duplicate:
+            value:
+              status: 409
+              message: Email already in use
+
+  '500':
+    $ref: ../../components/responses/500.yaml
