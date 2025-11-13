@@ -19,9 +19,7 @@ tags:
   - name: Stories
     description: Operations related to managing travel stories (CRUD, images, categories)
 
-
 paths:
-
   /auth/register:
     post:
       $ref: '../swagger/paths/auth/register.yaml'
@@ -46,9 +44,6 @@ paths:
   /users:
     get:
       $ref: '../swagger/paths/users/get.yaml'
-
-
-
 
   /users/{userId}:
     get:
@@ -92,15 +87,9 @@ paths:
 #     patch:
 #       $ref: '../swagger/paths/users/me/patch.yaml'
 
-
-
-
-
-
-
-  # /auth/authgoogle:
-  #   get:
-  #     $ref: '../swagger/paths/auth/authgoogle/get.yaml'
+# /auth/authgoogle:
+#   get:
+#     $ref: '../swagger/paths/auth/authgoogle/get.yaml'
 
 #   /auth/authgoogle/redirect:
 #     get:
@@ -112,7 +101,6 @@ paths:
 #       post:
 #     $ref: '../swagger/paths/stories/post.yaml'
 
-
 #   /stories/{storyId}:
 #     patch:
 #       $ref: '../swagger/paths/stories/{storyId}/patch.yaml'
@@ -123,17 +111,3 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-  responses:
-    '401':
-      $ref: '../swagger/components/responses/401.yaml'
-    '404':
-      $ref: '../swagger/components/responses/404-contact.yaml'
-    '500':
-      $ref: '../swagger/components/responses/500.yaml'
-
-  schemas:
-    user:
-      $ref: '../swagger/components/schemas/user.yaml'
-    articleCard:
-      $ref: '../swagger/components/schemas/articleCard.yaml'
