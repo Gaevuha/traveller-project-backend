@@ -12,7 +12,7 @@ export const getAllStories = async (query) => {
   const filter = parseFilterParams(query);
   const skip = (page - 1) * perPage;
 
-  
+
     if (query.excludeId && mongoose.isValidObjectId(query.excludeId)) {
     filter._id = { $ne: new mongoose.Types.ObjectId(query.excludeId) };
   }
@@ -38,7 +38,10 @@ export const getAllStories = async (query) => {
 
 // GET STRY BY ID (PUBKIC)
 export const getStoryById = async (storyId) =>{
-  const story = await TravellersCollection.findById({_id: storyId})
+  const story = await TravellersCollection.findById(storyId)
+    .populate('category', '_id name')
+    .populate('ownerId', '_id name avatarUrl description')
+    .lean();
   return story
 }
 
