@@ -107,6 +107,37 @@ export const getMeProfileController = async (req, res) => {
   });
 };
 
+// GET USER + SAVED ARTICLES (PRIVATE)
+export const getMeSavedArticlesController = async (req, res) => {
+  const userId = req.user._id;
+
+  const { user } = await getUserSavedArticles(userId);
+
+  if (!user) {
+    return res.status(404).json({
+      status: 404,
+      message: 'User not found',
+      data: null,
+    });
+  }
+
+  const savedStories = user.savedStories || [];
+
+  return res.status(200).json({
+    status: 200,
+    message: 'Successfully found saved stories for current user',
+    data: {
+      user: {
+        _id: user._id,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        description: user.description,
+        createdAt: user.createdAt,
+      },
+      savedStories,
+    },
+  });
+};
 
 
 // POST ARTICLE BY ID (PRIVATE)
