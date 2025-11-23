@@ -4,6 +4,7 @@ import {
   updateStoryById,
   addStory,
   getStoryById,
+  deleteStoryService,
 } from '../services/stories.js';
 
 import { checkCategoryExists } from '../services/categories.js';
@@ -22,7 +23,7 @@ export const getAllStoriesController = async (req, res) => {
 };
 
 // GET STORY BY ID
-export const getStoriesByIdControlle = async (req, res) => {
+export const getStoriesByIdController = async (req, res) => {
   const { storyId } = req.params;
 
   const story = await getStoryById(storyId);
@@ -72,7 +73,7 @@ export const createStoryController = async (req, res) => {
 export const patchStoryController = async (req, res) => {
   const { storyId } = req.params;
   const ownerId = req.user._id;
-   const storyRawData = req.body;
+  const storyRawData = req.body;
 
   function sortCategories(categoryName) {
     if (categoryName === 'Азія') return '68fb50c80ae91338641121f0';
@@ -143,5 +144,18 @@ export const patchStoryController = async (req, res) => {
     status: 200,
     message: `Successfully patched a story!`,
     data: updatedStory,
+  });
+};
+
+export const deleteStoryController = async (req, res) => {
+  const { storyId } = req.params;
+  const userId = req.user._id; // з middleware authenticate
+
+  const result = await deleteStoryService(storyId, userId);
+
+  res.status(200).json({
+    status: 200,
+    message: 'Story successfully deleted',
+    data: result,
   });
 };
