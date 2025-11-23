@@ -4,7 +4,8 @@ import {
   createStoryController,
   getAllStoriesController,
   patchStoryController,
-  getStoriesByIdControlle,
+  getStoriesByIdController,
+  deleteStoryController,
 } from '../controllers/stories.js';
 import { isValidId } from '../middlewares/isValidId.js';
 import { upload } from '../middlewares/multer.js';
@@ -14,16 +15,23 @@ const router = Router();
 
 //публічний
 router.get('/', ctrlWrapper(getAllStoriesController)); //створити публічний ендпоінт для ОТРИМАННЯ історій + пагінація + фільтрація за категоріями
-router.get('/:storyId', ctrlWrapper(getStoriesByIdControlle)) // створити публічний ендпоінт для ОТРИМАННЯ однієї історій
+router.get('/:storyId', ctrlWrapper(getStoriesByIdController)); // створити публічний ендпоінт для ОТРИМАННЯ однієї історій
 
 //приватний
 router.use(authenticate);
-router.post('/', authenticate, upload.single('img'), ctrlWrapper(createStoryController)); //створити приватний ендпоінт для СТВОРЕННЯ історії
+router.post(
+  '/',
+  authenticate,
+  upload.single('img'),
+  ctrlWrapper(createStoryController),
+); //створити приватний ендпоінт для СТВОРЕННЯ історії
+
 router.patch(
   '/:storyId',
   isValidId,
   upload.single('img'),
   ctrlWrapper(patchStoryController),
 ); //створити приватний ендпоінт для РЕДАГУВАННЯ історії
+router.delete('/:storyId', isValidId, ctrlWrapper(deleteStoryController));
 
 export default router;
