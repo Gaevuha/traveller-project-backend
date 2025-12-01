@@ -9,7 +9,6 @@ import {
 } from '../services/auth.js';
 import { generateOAuthUrl } from '../utils/googleAuth.js';
 
-
 // POST REGISTER USER (PUBLIC)
 export const registerUserController = async (req, res) => {
   const newUser = await registerUser(req.body);
@@ -20,7 +19,6 @@ export const registerUserController = async (req, res) => {
     data: { user: newUser },
   });
 };
-
 
 // POST LOGIN USER (PUBLIC)
 export const loginUserController = async (req, res) => {
@@ -61,7 +59,6 @@ export const loginUserController = async (req, res) => {
   });
 };
 
-
 // POST REFRESH USER (PUBLIC)
 export const refreshUserSessionController = async (req, res) => {
   const { sessionId, refreshToken } = req.cookies || {};
@@ -81,7 +78,6 @@ export const refreshUserSessionController = async (req, res) => {
   });
 };
 
-
 // POST LOGOUT (PRIVATE)
 export const logoutUserController = async (req, res) => {
   const { sessionId } = req.cookies || {};
@@ -93,7 +89,6 @@ export const logoutUserController = async (req, res) => {
   clearSessionCookies(res);
   res.status(204).send();
 };
-
 
 // POST SEND RESET EMAIL (PUBLIC)
 export const sendResetEmailController = async (req, res) => {
@@ -107,7 +102,6 @@ export const sendResetEmailController = async (req, res) => {
   });
 };
 
-
 // POST RESET PASSWORD (PUBLIC)
 export const resetPasswordController = async (req, res) => {
   await resetPassword(req.body);
@@ -119,10 +113,10 @@ export const resetPasswordController = async (req, res) => {
   });
 };
 
-
 // GET GOOGLE AUTH (PUBLIC)
 export const getGoogleOAuthUrlController = async (_req, res) => {
   const url = generateOAuthUrl();
+  console.log('🌐 [Controller] Google OAuth URL:', url);
 
   res.json({
     status: 200,
@@ -130,7 +124,6 @@ export const getGoogleOAuthUrlController = async (_req, res) => {
     data: { url },
   });
 };
-
 
 // POST GOOGLE CONFIRM
 export const loginWithGoogleOAuthController = async (req, res) => {
@@ -180,7 +173,6 @@ export const loginWithGoogleOAuthController = async (req, res) => {
     },
   });
 };
-
 
 /// SESSION
 const setSessionCookies = (res, session) => {

@@ -2,7 +2,6 @@ import { OAuth2Client } from 'google-auth-library';
 import createHttpError from 'http-errors';
 import { getEnvVar } from './getEnvVar.js';
 
-
 const redirectUri = getEnvVar('GOOGLE_OAUTH_REDIRECT');
 const clientId = getEnvVar('GOOGLE_OAUTH_CLIENT_ID');
 const clientSecret = getEnvVar('GOOGLE_OAUTH_CLIENT_SECRET');
@@ -13,11 +12,9 @@ const googleOAuthClient = new OAuth2Client({
   redirectUri,
 });
 
-
-
 // GET GOOGLE AUTH (PUBLIC)
-export const generateOAuthUrl = () =>
-  googleOAuthClient.generateAuthUrl({
+export const generateOAuthUrl = () => {
+  const url = googleOAuthClient.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: [
@@ -26,7 +23,10 @@ export const generateOAuthUrl = () =>
       'https://www.googleapis.com/auth/userinfo.profile',
     ],
   });
+  console.log('🌐 [Google OAuth] Generated URL:', url);
 
+  return url;
+};
 /**
  * Валідує код із фронтенду (callback), обмінює його на токен
  */
