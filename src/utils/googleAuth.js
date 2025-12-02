@@ -13,8 +13,11 @@ const googleOAuthClient = new OAuth2Client({
 });
 
 // GET GOOGLE AUTH (PUBLIC)
-export const generateOAuthUrl = () =>
-  googleOAuthClient.generateAuthUrl({
+export const generateOAuthUrl = () => {
+  const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT;
+  console.log('🔗 Using redirect URI:', redirectUri);
+
+  return googleOAuthClient.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: [
@@ -23,6 +26,7 @@ export const generateOAuthUrl = () =>
       'https://www.googleapis.com/auth/userinfo.profile',
     ],
   });
+};
 
 /**
  * Валідує код із фронтенду (callback), обмінює його на токен
