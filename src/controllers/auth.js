@@ -127,51 +127,76 @@ export const getGoogleOAuthUrlController = (req, res) => {
 
 // POST GOOGLE CONFIRM
 export const loginWithGoogleOAuthController = async (req, res) => {
-  const result = await loginWithGoogleOAuth(req.body.code);
+  try {
+    const result = await loginWithGoogleOAuth(req.body.code);
 
-  if (!result || !result.session) {
-    return res.status(401).json({
-      status: 401,
-      message: 'Google authentication failed!',
+    if (!result || !result.session) {
+      return res.status(401).json({
+        status: 401,
+        message: 'Google authentication failed!',
+        data: {},
+      });
+    }
+
+    const session = result.session;
+    const isProd = process.env.NODE_ENV === 'production';
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      path: '/',
+    };
+
+    res.cookie('refreshToken', session.refreshToken, {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie('sessionId', session._id.toString(), {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie('accessToken', session.accessToken, {
+      ...cookieOptions,
+      maxAge: 15 * 60 * 1000,
+    });
+
+    // 1. Отримуємо повний об'єкт користувача з БД
+    const User = await import('../db/models/user.js'); // або ваш імпорт
+    const fullUser = await User.UsersCollection.findById(result.user.id);
+
+    // 2. Формуємо повний об'єкт для відповіді
+    const userResponse = {
+      _id: fullUser._id,
+      name: fullUser.name,
+      email: fullUser.email,
+      avatarUrl: fullUser.avatarUrl || '', // Додаємо avatarUrl
+      articlesAmount: fullUser.articlesAmount || 0,
+      createdAt: fullUser.createdAt,
+      updatedAt: fullUser.updatedAt,
+      description: fullUser.description || '',
+    };
+
+    res.json({
+      status: 200,
+      message: 'Successfully logged in with Google',
+      data: {
+        user: userResponse, // Повний об'єкт
+        accessToken: session.accessToken,
+        accessTokenValidUntil: session.accessTokenValidUntil,
+        sessionId: session._id,
+      },
+    });
+  } catch (error) {
+    console.error('Google OAuth controller error:', error);
+    res.status(500).json({
+      status: 500,
+      message: 'Internal server error',
       data: {},
     });
   }
-
-  const session = result.session;
-  const isProd = process.env.NODE_ENV === 'production';
-
-  const cookieOptions = {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? 'none' : 'lax',
-    path: '/',
-  };
-
-  res.cookie('refreshToken', session.refreshToken, {
-    ...cookieOptions,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-
-  res.cookie('sessionId', session._id.toString(), {
-    ...cookieOptions,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-
-  res.cookie('accessToken', session.accessToken, {
-    ...cookieOptions,
-    maxAge: 15 * 60 * 1000,
-  });
-
-  res.json({
-    status: 200,
-    message: 'Successfully logged in with Google',
-    data: {
-      user: result.user,
-      accessToken: session.accessToken,
-      accessTokenValidUntil: session.accessTokenValidUntil,
-      sessionId: session._id,
-    },
-  });
 };
 
 /// SESSION

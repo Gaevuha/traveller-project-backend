@@ -32,7 +32,6 @@ export const findUser = (query) => UsersCollection.findOne(query);
 const jwtSecret = getEnvVar('JWT_SECRET');
 const appDomain = getEnvVar('APP_DOMAIN');
 
-
 // POST REGISTER USER
 export const registerUser = async (data) => {
   const { email } = data;
@@ -47,7 +46,6 @@ export const registerUser = async (data) => {
     email: newUser.email,
   };
 };
-
 
 // POST LOGIN USER
 export const loginUser = async ({ email, password }) => {
@@ -71,7 +69,6 @@ export const loginUser = async ({ email, password }) => {
   };
 };
 
-
 // POST REFRESH USER (PUBLIC)
 export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
   const oldSession = await findSession({ _id: sessionId, refreshToken });
@@ -90,12 +87,10 @@ export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
   return newSession;
 };
 
-
 // POST LOGOUT (PRIVATE)
 export const logoutUser = async (sessionId) => {
   await SessionsCollection.deleteOne({ _id: sessionId });
 };
-
 
 // POST SEND RESET EMAIL (PUBLICK)
 export const sendResetToken = async (email) => {
@@ -139,7 +134,6 @@ export const sendResetToken = async (email) => {
   });
 };
 
-
 // POST RESET PASSWORD (PUBLIC)
 export const resetPassword = async ({ token, password }) => {
   let payload;
@@ -162,23 +156,35 @@ export const resetPassword = async ({ token, password }) => {
   );
 };
 
-
 // POST GOOGLE CONFIRME
+// services/auth.js - оновіть цю функцію
 export const loginWithGoogleOAuth = async (code) => {
   const loginTicket = await validateCode(code);
   const payload = loginTicket.getPayload();
   if (!payload) throw createHttpError(401, 'Google payload missing');
 
   let user = await findUser({ email: payload.email });
+
   if (!user) {
     const name = getFullNameFromGoogleTokenPayload(payload);
     const plainPassword = randomBytes(10).toString('base64');
 
+    // Створюємо користувача з аватаркою з Google
     user = await UsersCollection.create({
       name,
       email: payload.email,
       password: plainPassword,
+      avatarUrl: payload.picture || '', // Зберігаємо аватар з Google
     });
+  } else {
+    // Оновлюємо аватар, якщо його немає або він з Google
+    if (
+      payload.picture &&
+      (!user.avatarUrl || user.avatarUrl.includes('googleusercontent.com'))
+    ) {
+      user.avatarUrl = payload.picture;
+      await user.save();
+    }
   }
 
   await SessionsCollection.deleteMany({ userId: user._id });
@@ -190,7 +196,12 @@ export const loginWithGoogleOAuth = async (code) => {
   });
 
   return {
-    user: { id: user._id, name: user.name, email: user.email },
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      // Можна додати інші поля тут
+    },
     session: newSession,
   };
 };
