@@ -1,5 +1,6 @@
 import express from 'express';
 import pinoHttp from 'pino-http';
+import themeRoutes from './routers/themeRoutes.js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { getEnvVar } from './utils/getEnvVar.js';
@@ -58,6 +59,9 @@ export async function setupServer() {
 
   // Роуты
   app.use('/api', router);
+
+  //Тема
+  app.use('/api/theme', themeRoutes);
 
   // Статика
   app.use('/uploads', express.static(UPLOAD_DIR));
