@@ -1,4 +1,3 @@
-// src/controllers/themeController.js
 import createHttpError from 'http-errors';
 import themeService from '../services/themeService.js';
 
@@ -8,28 +7,24 @@ import themeService from '../services/themeService.js';
  */
 export const saveThemeController = async (req, res) => {
   const { theme } = req.body;
-  const userId = req.user?._id; // Може бути undefined, якщо не авторизований
+  const userId = req.user?._id;
 
-  // Валідація
   if (!theme || !['light', 'dark'].includes(theme)) {
     throw createHttpError(400, 'Theme must be "light" or "dark"');
   }
 
-  // Якщо користувач авторизований - зберегти в БД
   let savedToDatabase = false;
   if (userId) {
     await themeService.saveUserTheme(userId, theme);
     savedToDatabase = true;
   }
 
-  // Зберегти в сесії (якщо використовуєте сесії)
   if (req.session) {
     req.session.theme = theme;
   }
 
-  // Встановити кукі
   res.cookie('theme', theme, {
-    maxAge: 365 * 24 * 60 * 60 * 1000, // 1 рік
+    maxAge: 365 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -55,22 +50,18 @@ export const saveThemeController = async (req, res) => {
  */
 export const saveThemePrivateController = async (req, res) => {
   const { theme } = req.body;
-  const userId = req.user._id; // Тут точно є, бо пройшов authenticate
+  const userId = req.user._id;
 
-  // Валідація
   if (!theme || !['light', 'dark'].includes(theme)) {
     throw createHttpError(400, 'Theme must be "light" or "dark"');
   }
 
-  // Зберегти в БД
   const updatedUser = await themeService.saveUserTheme(userId, theme);
 
-  // Зберегти в сесії (якщо використовуєте сесії)
   if (req.session) {
     req.session.theme = theme;
   }
 
-  // Встановити кукі
   res.cookie('theme', theme, {
     maxAge: 365 * 24 * 60 * 60 * 1000,
     httpOnly: true,
@@ -100,58 +91,43 @@ export const saveThemePrivateController = async (req, res) => {
  * @access Public
  */
 export const getThemeController = async (req, res) => {
-  const userId = req.user?._id; // Може бути undefined
-
-  const theme = await themeService.resolveTheme(
-    userId,
-    req.cookies,
-    req.session,
-  );
-
-  // Визначення джерела теми
-  let source = 'default';
-  if (userId) {
-    source = 'database';
-  } else if (req.cookies?.theme) {
-    source = 'cookies';
-  } else if (req.session?.theme) {
-    source = 'session';
-  }
-
-  res.status(200).json({
-    status: 200,
-    message: 'Theme retrieved successfully',
-    data: {
-      theme,
-      source,
-      userId: userId || null,
-    },
-  });
-};
-
-/**
- * Middleware для встановлення теми в res.locals
- */
-export const setThemeMiddleware = async (req, res, next) => {
   try {
+    const { UsersCollection } = await import('../db/models/user.js');
     const userId = req.user?._id;
 
-    const theme = await themeService.resolveTheme(
-      userId,
-      req.cookies,
-      req.session,
-    );
+    let theme = 'light';
+    let source = 'default';
 
-    // Додати тему до res.locals для використання в шаблонах
-    res.locals.theme = theme;
+    if (userId) {
+      const user = await UsersCollection.findById(userId).select('theme');
+      if (user?.theme) {
+        theme = user.theme;
+        source = 'database';
+      }
+    }
 
-    // Додати для API відповідей
-    req.theme = theme;
+    if (theme === 'light' && req.cookies?.theme) {
+      const cookieTheme = req.cookies.theme;
+      if (cookieTheme === 'light' || cookieTheme === 'dark') {
+        theme = cookieTheme;
+        source = 'cookies';
+      }
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: 'Theme retrieved successfully',
+      data: {
+        theme,
+        source,
+        userId: userId || null,
+      },
+    });
   } catch (error) {
-    console.error('ThemeMiddleware error:', error);
-    res.locals.theme = 'light';
-    req.theme = 'light';
+    console.error('getThemeController error:', error);
+    res.status(500).json({
+      status: 500,
+      message: 'Internal server error',
+    });
   }
-
-  next();
 };

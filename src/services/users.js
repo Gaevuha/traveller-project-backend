@@ -51,7 +51,7 @@ export const getUserById = async (userId, page = 1, perPage = 10) => {
 
   // Отримуємо загальну кількість статей для пагінації
   const totalArticles = await TravellersCollection.countDocuments({
-    ownerId: userId, // Використовуємо той самий критерій пошуку
+    ownerId: userId,
   });
 
   const totalPages = Math.ceil(totalArticles / perPage);

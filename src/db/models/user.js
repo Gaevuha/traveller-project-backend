@@ -23,6 +23,8 @@ const usersSchema = new Schema(
       type: String,
       enum: ['light', 'dark'],
       default: 'light',
+      required: false,
+      select: true,
     },
 
     articles: {

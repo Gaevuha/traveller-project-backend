@@ -104,7 +104,6 @@ export const getMeProfileController = async (req, res) => {
   });
 };
 
-
 // GET USER + SAVED ARTICLES (PRIVATE)
 export const getMeSavedArticlesController = async (req, res) => {
   const userId = req.user._id;
@@ -136,7 +135,6 @@ export const getMeSavedArticlesController = async (req, res) => {
     },
   });
 };
-
 
 // POST ARTICLE BY ID (PRIVATE)
 export const addSavedArticleController = async (req, res) => {
@@ -240,11 +238,9 @@ export const patchMeController = async (req, res, next) => {
         update.avatarUrl = avatarUrl;
       } catch (error) {
         return next(
-          createHttpError(
-            500,
-            'Failed to upload avatar image',
-            { details: error.message },
-          ),
+          createHttpError(500, 'Failed to upload avatar image', {
+            details: error.message,
+          }),
         );
       }
     }
@@ -262,5 +258,40 @@ export const patchMeController = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+export const getMeController = async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      status: 401,
+      message: 'Not authenticated',
+    });
+  }
+
+  try {
+    // Повертаємо базову інформацію про користувача
+    const userResponse = {
+      _id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      avatarUrl: req.user.avatarUrl,
+      articlesAmount: req.user.articlesAmount || 0,
+      description: req.user.description || '',
+      theme: req.user.theme || 'light', // Додайте це поле!
+      createdAt: req.user.createdAt,
+      updatedAt: req.user.updatedAt,
+    };
+
+    res.status(200).json({
+      status: 200,
+      data: userResponse,
+    });
+  } catch (error) {
+    console.error('❌ getMeController error:', error);
+    res.status(500).json({
+      status: 500,
+      message: 'Internal server error',
+    });
   }
 };
