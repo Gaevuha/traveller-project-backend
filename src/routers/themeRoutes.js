@@ -9,13 +9,10 @@ import { authenticate } from '../middlewares/authenticate.js';
 
 const router = express.Router();
 
-// Публічний маршрут
 router.post('/', ctrlWrapper(saveThemeController));
 
-// Приватний маршрут
 router.post('/private', authenticate, ctrlWrapper(saveThemePrivateController));
 
-// Отримання теми
-router.get('/', ctrlWrapper(getThemeController));
+router.get('/', authenticate, ctrlWrapper(getThemeController));
 
 export default router;
