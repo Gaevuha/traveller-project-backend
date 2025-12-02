@@ -1,3 +1,4 @@
+// models/users.js
 import { model, Schema } from 'mongoose';
 import { handleSaveError, setUpdateSetting, hashPassword } from '../hooks.js';
 
@@ -17,13 +18,20 @@ const usersSchema = new Schema(
     email: { type: String, unique: true, required: true, trim: true },
     password: { type: String, required: true, minlength: 8, select: false },
 
+    // Додаємо поле для теми
+    theme: {
+      type: String,
+      enum: ['light', 'dark'],
+      default: 'light',
+    },
+
     articles: {
       type: [{ type: Schema.Types.ObjectId, ref: 'travellers' }],
       default: [],
       select: false,
     },
 
-      savedStories: {
+    savedStories: {
       type: [{ type: Schema.Types.ObjectId, ref: 'travellers' }],
       default: [],
       select: false,
