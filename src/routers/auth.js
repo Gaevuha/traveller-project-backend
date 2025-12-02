@@ -54,9 +54,20 @@ authRouter.get('/google', async (req, res, next) => {
     if (!code)
       return res.status(400).json({ message: 'Missing authorization code' });
 
-    const { session } = await loginWithGoogleOAuth(code);
+    // Отримуємо BOTH user та session
+    const result = await loginWithGoogleOAuth(code);
 
+    if (!result || !result.session) {
+      return res.status(401).json({
+        status: 401,
+        message: 'Google authentication failed!',
+        data: {},
+      });
+    }
+
+    const { session } = result;
     const isProd = process.env.NODE_ENV === 'production';
+
     const cookieOptions = {
       httpOnly: true,
       secure: isProd,
