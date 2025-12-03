@@ -9,10 +9,11 @@ export const authenticate = async (req, res, next) => {
       req.get('Authorization')?.split(' ')[1];
 
     if (!accessToken) {
-      return next(createHttpError(401, 'Authorization token is missing'));
+      return next(); // Продовжуємо без автентифікації
     }
 
     const session = await findSession({ accessToken });
+
     if (!session) {
       return next(createHttpError(401, 'Session not found or invalid token'));
     }
@@ -22,14 +23,23 @@ export const authenticate = async (req, res, next) => {
     }
 
     const user = await findUser({ _id: session.userId });
+
     if (!user) {
       return next(createHttpError(401, 'User not found'));
     }
 
-    req.user = user;
+    // Додаємо користувача до запиту
+    req.user = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      theme: user.theme,
+      avatarUrl: user.avatarUrl,
+    };
+
     return next();
   } catch (error) {
-    console.error('Auth error:', error.message);
+    console.error(error.message);
     return next(createHttpError(500, 'Authentication failed'));
   }
 };
