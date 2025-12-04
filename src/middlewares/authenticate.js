@@ -1,34 +1,35 @@
-import createHttpError from 'http-errors';
 import { findSession, findUser } from '../services/auth.js';
 
 export const authenticate = async (req, res, next) => {
   try {
-    const accessToken =
-      req.cookies?.accessToken ||
-      req.cookies?.refreshToken ||
-      req.get('Authorization')?.split(' ')[1];
+    let accessToken;
 
-    if (!accessToken) {
-      return next(); // Продовжуємо без автентифікації
+    // 1. Перевіряємо accessToken в cookies
+    if (req.cookies?.accessToken) {
+      accessToken = req.cookies.accessToken;
     }
 
+    if (!accessToken) {
+      req.user = null;
+      return next();
+    }
+
+    // 2. Шукаємо сесію
     const session = await findSession({ accessToken });
 
     if (!session) {
-      return next(createHttpError(401, 'Session not found or invalid token'));
+      req.user = null;
+      return next();
     }
 
-    if (new Date(session.accessTokenValidUntil) < new Date()) {
-      return next(createHttpError(401, 'Access token has expired'));
-    }
-
+    // 3. Знаходимо користувача
     const user = await findUser({ _id: session.userId });
-
     if (!user) {
-      return next(createHttpError(401, 'User not found'));
+      req.user = null;
+      return next();
     }
 
-    // Додаємо користувача до запиту
+    // 4. Додаємо користувача до запиту
     req.user = {
       _id: user._id,
       name: user.name,
@@ -37,9 +38,10 @@ export const authenticate = async (req, res, next) => {
       avatarUrl: user.avatarUrl,
     };
 
-    return next();
+    next();
   } catch (error) {
-    console.error(error.message);
-    return next(createHttpError(500, 'Authentication failed'));
+    console.error('Authentication error:', error.message);
+    req.user = null;
+    next();
   }
 };

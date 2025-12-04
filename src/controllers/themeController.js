@@ -1,7 +1,7 @@
 import { UsersCollection } from '../db/models/user.js';
 
 /**
- * POST /api/theme - Зберегти тему
+ * POST /api/theme - Зберегти тему в БД
  */
 export const saveThemeController = async (req, res) => {
   const { theme } = req.body;
@@ -14,22 +14,32 @@ export const saveThemeController = async (req, res) => {
     });
   }
 
+  // Тільки для авторизованих користувачів
   if (!userId) {
-    return res.status(401).json({
-      status: 401,
-      message: 'User not authenticated',
+    // Встановлюємо cookie для гостя
+    res.cookie('theme', theme, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Theme saved locally (guest)',
+      data: { theme, savedInDB: false },
     });
   }
 
   try {
-    // Оновлюємо тему в БД
     const updatedUser = await UsersCollection.findByIdAndUpdate(
       userId,
-      { theme },
+      { $set: { theme } },
       {
         new: true,
         select: '-password',
         runValidators: true,
+        lean: true,
       },
     );
 
@@ -40,13 +50,12 @@ export const saveThemeController = async (req, res) => {
       });
     }
 
-    // Встановлюємо cookie
+    // Оновлюємо cookie
     res.cookie('theme', theme, {
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      path: '/',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(200).json({
@@ -54,18 +63,21 @@ export const saveThemeController = async (req, res) => {
       message: 'Theme saved successfully',
       data: {
         theme,
-        savedToDatabase: true,
-        userId,
-        user: {
-          _id: updatedUser._id,
-          name: updatedUser.name,
-          avatarUrl: updatedUser.avatarUrl,
-          theme: updatedUser.theme,
-        },
+        savedInDB: true,
+        userId: updatedUser._id.toString(),
       },
     });
   } catch (error) {
-    console.error('Помилка при збереженні теми:', error);
+    console.error('Theme save error:', error.message);
+
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        status: 400,
+        message: 'Invalid user ID format',
+        error: error.message,
+      });
+    }
+
     return res.status(500).json({
       status: 500,
       message: 'Database error',
@@ -75,134 +87,62 @@ export const saveThemeController = async (req, res) => {
 };
 
 /**
- * GET /api/theme - Отримати поточну тему
+ * GET /api/theme - Отримати тему з БД
  */
 export const getThemeController = async (req, res) => {
   try {
     const userId = req.user?._id;
+
+    // За замовчуванням - світла тема
     let theme = 'light';
     let source = 'default';
 
-    // 1. Спочатку перевіряємо авторизованого користувача в базі
+    // Тільки для авторизованих користувачів
     if (userId) {
-      const user = await UsersCollection.findById(userId).select(
-        'theme name email',
-      );
+      const user = await UsersCollection.findById(userId)
+        .select('theme')
+        .lean();
 
       if (user?.theme) {
         theme = user.theme;
         source = 'database';
       }
-    }
-
-    // 2. Якщо не авторизований або в базі немає теми - перевіряємо cookie
-    if (source === 'default' && req.cookies?.theme) {
-      const cookieTheme = req.cookies.theme;
-      if (cookieTheme === 'light' || cookieTheme === 'dark') {
+    } else {
+      // Для гостя - перевірити cookie
+      const cookieTheme = req.cookies?.theme;
+      if (cookieTheme && (cookieTheme === 'light' || cookieTheme === 'dark')) {
         theme = cookieTheme;
-        source = 'cookies';
+        source = 'cookie';
       }
-    }
-
-    // 3. Оновлюємо cookie якщо потрібно
-    if (userId && req.cookies?.theme !== theme) {
-      res.cookie('theme', theme, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-      });
     }
 
     return res.status(200).json({
       status: 200,
-      message: 'Theme retrieved successfully',
+      message: 'Theme retrieved',
       data: {
         theme,
         source,
-        userId: userId || null,
-        hasAuth: !!userId,
+        userId: userId ? userId.toString() : null,
       },
     });
   } catch (error) {
-    console.error('Помилка при отриманні теми:', error);
-    return res.status(200).json({
-      status: 200,
-      theme: 'light',
-      source: 'default (error)',
-    });
-  }
-};
+    console.error('Theme get error:', error);
 
-/**
- * GET /api/theme/public - Отримати тему без автентифікації
- */
-export const getThemePublicController = async (req, res) => {
-  try {
-    let theme = 'light';
-    let source = 'default';
-
-    if (req.cookies?.theme) {
-      const cookieTheme = req.cookies.theme;
-      if (cookieTheme === 'light' || cookieTheme === 'dark') {
-        theme = cookieTheme;
-        source = 'cookies';
-      }
-    }
+    // Fallback до cookie або default
+    const cookieTheme = req.cookies?.theme;
+    const fallbackTheme =
+      cookieTheme && (cookieTheme === 'light' || cookieTheme === 'dark')
+        ? cookieTheme
+        : 'light';
 
     return res.status(200).json({
       status: 200,
-      message: 'Theme retrieved (public)',
+      message: 'Theme retrieved (fallback)',
       data: {
-        theme,
-        source,
+        theme: fallbackTheme,
+        source: 'fallback',
         userId: null,
       },
     });
-  } catch (error) {
-    console.error('Помилка отримання публічної теми:', error);
-    return res.status(200).json({
-      status: 200,
-      theme: 'light',
-      source: 'default',
-    });
   }
 };
-
-/**
- * Middleware для синхронізації cookie з базою даних
- */
-export const syncThemeCookieMiddleware = async (req, res, next) => {
-  try {
-    if (req.user?._id) {
-      const user = await UsersCollection.findById(req.user._id).select(
-        'theme name',
-      );
-
-      if (
-        user?.theme &&
-        req.cookies?.theme &&
-        req.cookies.theme !== user.theme
-      ) {
-        res.cookie('theme', user.theme, {
-          maxAge: 30 * 24 * 60 * 60 * 1000,
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          path: '/',
-        });
-
-        req.cookieWasSynced = true;
-        req.syncedTheme = user.theme;
-      }
-    }
-  } catch (error) {
-    console.error('Помилка синхронізації cookie:', error);
-  }
-
-  next();
-};
-
-// Аліас для зворотної сумісності
-export const saveThemePrivateController = saveThemeController;
