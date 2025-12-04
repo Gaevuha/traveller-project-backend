@@ -47,14 +47,12 @@ export const loginUserController = async (req, res) => {
     maxAge: 15 * 60 * 1000,
   });
 
+  // ✅ БЕЗ accessToken у JSON
   res.json({
     status: 200,
     message: 'User successfully logged in',
     data: {
       user,
-      accessToken: session.accessToken,
-      accessTokenValidUntil: session.accessTokenValidUntil,
-      sessionId: session._id,
     },
   });
 };

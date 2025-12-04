@@ -1,6 +1,5 @@
 import express from 'express';
 import pinoHttp from 'pino-http';
-import themeRoutes from './routers/themeRoutes.js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { getEnvVar } from './utils/getEnvVar.js';
@@ -30,13 +29,23 @@ export async function setupServer() {
         'https://project-traveller-app.netlify.app',
       ],
       credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+      allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'Cookie',
+        'Accept',
+        'Origin',
+        'X-Requested-With',
+      ],
+      exposedHeaders: ['Set-Cookie'],
     }),
   );
 
   // Cookies
   app.use(cookieParser());
 
-  // Логи pino: в проде без pino-pretty, локально — з pretty
+  // Логи pino
   const logger = isProd
     ? pinoHttp()
     : pinoHttp({
@@ -48,20 +57,16 @@ export async function setupServer() {
           },
         },
       });
-
   app.use(logger);
 
-  // Примитивный лог времени
+  // Примітивний лог часу
   app.use((req, res, next) => {
     console.log(`Time: ${new Date().toISOString()} | ${req.method} ${req.url}`);
     next();
   });
 
-  // Роуты
+  // Роути: всі роутери під /api
   app.use('/api', router);
-
-  //Тема
-  app.use('/api/theme', themeRoutes);
 
   // Статика
   app.use('/uploads', express.static(UPLOAD_DIR));
@@ -75,20 +80,19 @@ export async function setupServer() {
   // Error handler
   app.use(errorHandler);
 
-  // Запуск сервера — оборачиваем в Promise, чтобы bootstrap мог дождаться
   return new Promise((resolve, reject) => {
     try {
       app.listen(PORT, (error) => {
         if (error) {
-          console.error('❌ Server startup error:', error);
+          console.error('Server startup error:', error);
           reject(error);
           return;
         }
-        console.log(`🚀 Server is running on port ${PORT}`);
+        console.log(`Server is running on port ${PORT}`);
         resolve();
       });
     } catch (error) {
-      console.error('❌ Server startup error (sync):', error);
+      console.error('Server startup error (sync):', error);
       reject(error);
     }
   });
