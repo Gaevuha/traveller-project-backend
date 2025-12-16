@@ -10,6 +10,6 @@ const router = express.Router();
 
 router.post('/', authenticate, ctrlWrapper(saveThemeController));
 
-router.get('/', authenticate, ctrlWrapper(getThemeController));
+router.get('/', ctrlWrapper(getThemeController));
 
 export default router;
