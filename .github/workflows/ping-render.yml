@@ -1,0 +1,16 @@
+name: Ping Render Backend
+
+on:
+  schedule:
+    - cron: '*/10 * * * *' # кожні 10 хвилин
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping backend
+        run: |
+          echo "Pinging backend..."
+          curl -s https://ТВІЙ-БЕКЕНД.onrender.com/health

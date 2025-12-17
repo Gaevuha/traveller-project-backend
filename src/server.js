@@ -21,6 +21,11 @@ export async function setupServer() {
   // JSON
   app.use(express.json());
 
+  //HEALTH
+  app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
+
   // CORS
   app.use(
     cors({
