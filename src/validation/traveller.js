@@ -42,6 +42,8 @@ const updateStorySchema = Joi.object({
       'any.invalid': 'Category must be a valid category ID',
     })
     .optional(),
+
+  // img не додаємо сюди, обробляємо окремо
 })
   .min(1)
   .messages({
