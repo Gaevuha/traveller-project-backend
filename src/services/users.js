@@ -139,24 +139,61 @@ export const addArticleToSaved = async (userId, storyId) => {
 
 // DELETE ARTICLE BY ID (PRIVATE)
 export const deleteSavedStory = async (userId, storyId) => {
-  if (!mongoose.Types.ObjectId.isValid(storyId)) {
-    throw createHttpError(400, 'Invalid storyId');
-  }
+  console.log('🧩 deleteSavedStory START');
+  console.log('userId:', userId);
+  console.log('storyId:', storyId);
 
-  const res = await UsersCollection.updateOne(
-    { _id: userId, savedStories: storyId, savedAmount: { $gt: 0 } },
-    { $pull: { savedStories: storyId }, $inc: { savedAmount: -1 } },
-  );
+  try {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      console.error('❌ INVALID userId');
+      return { removed: false };
+    }
 
-  const removed = res.modifiedCount > 0;
-  if (removed) {
-    await TravellersCollection.updateOne(
-      { _id: storyId, favoriteCount: { $gt: 0 } },
-      { $inc: { favoriteCount: -1 } },
+    if (!mongoose.Types.ObjectId.isValid(storyId)) {
+      console.error('❌ INVALID storyId');
+      return { removed: false };
+    }
+
+    const user = await UsersCollection.findById(userId);
+    console.log('👤 user found:', !!user);
+
+    if (!user) return { removed: false };
+
+    if (!Array.isArray(user.savedStories)) {
+      console.error('❌ savedStories is NOT array:', user.savedStories);
+      return { removed: false };
+    }
+
+    const index = user.savedStories.findIndex(
+      (id) => id.toString() === storyId,
     );
-  }
 
-  return { removed };
+    console.log('📍 story index:', index);
+
+    if (index === -1) return { removed: false };
+
+    user.savedStories.splice(index, 1);
+    user.savedAmount = Math.max((user.savedAmount ?? 0) - 1, 0);
+
+    await user.save();
+    console.log('✅ user saved');
+
+    try {
+      await TravellersCollection.updateOne(
+        { _id: storyId, favoriteCount: { $gt: 0 } },
+        { $inc: { favoriteCount: -1 } },
+      );
+      console.log('⭐ favoriteCount updated');
+    } catch (err) {
+      console.warn('⚠️ favoriteCount update failed:', err.message);
+    }
+
+    return { removed: true };
+  } catch (err) {
+    console.error('🔥 deleteSavedStory CRASH');
+    console.error(err);
+    throw err; // ← ВАЖЛИВО
+  }
 };
 
 //PATCH AVATAR (PRIVATE)

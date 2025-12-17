@@ -9,9 +9,10 @@ import {
   getUserSavedArticles,
 } from '../services/users.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
-import { deleteSavedStory } from '../services/users.js';
+// import { deleteSavedStory } from '../services/users.js';
 import { uploadImageToCloudinary } from '../services/cloudinary.js';
 import { UsersCollection } from '../db/models/user.js';
+import { TravellersCollection } from '../db/models/traveller.js';
 
 // GET ALL USERS (PUBLIC)
 export const getAllUsersController = async (req, res) => {
@@ -165,20 +166,54 @@ export const addSavedArticleController = async (req, res) => {
 
 // DELETE ARTICLE BY ID (PRIVATE)
 export const deleteMeSavedStoriesController = async (req, res) => {
-  const userId = req.user._id;
-  const { storyId } = req.params;
+  try {
+    const userId = req.user?._id;
+    const { storyId } = req.params;
 
-  const { removed } = await deleteSavedStory(userId, storyId);
+    if (!userId)
+      return res.status(401).json({ status: 401, message: 'Unauthorized' });
+    if (!storyId)
+      return res
+        .status(400)
+        .json({ status: 400, message: 'storyId is required' });
 
-  const user = await UsersCollection.findById(userId)
-    .select('+savedStories')
-    .lean();
+    const user = await UsersCollection.findById(userId).select('+savedStories');
+    if (!user)
+      return res.status(404).json({ status: 404, message: 'User not found' });
 
-  res.status(200).json({
-    status: 200,
-    message: removed ? 'Story removed from saved' : 'Story was not in saved',
-    data: { user: { savedStories: (user.savedStories || []).map(String) } },
-  });
+    const index = user.savedStories.findIndex(
+      (id) => id.toString() === storyId,
+    );
+    if (index === -1)
+      return res.status(200).json({
+        status: 200,
+        message: 'Story was not in saved',
+        data: { savedStories: user.savedStories.map(String) },
+      });
+
+    // Видаляємо історію зі збережених
+    user.savedStories.splice(index, 1);
+    user.savedAmount = Math.max((user.savedAmount ?? 0) - 1, 0);
+
+    await user.save();
+
+    // Зменшуємо favoriteCount у Traveller
+    await TravellersCollection.updateOne(
+      { _id: storyId, favoriteCount: { $gt: 0 } },
+      { $inc: { favoriteCount: -1 } },
+    );
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Story removed from saved',
+      data: { savedStories: user.savedStories.map(String) },
+    });
+  } catch (err) {
+    console.error('🔥 DELETE SAVED STORY ERROR', err);
+    return res
+      .status(500)
+      .json({ status: 500, message: 'Internal server error' });
+  }
 };
 
 //PATCH AVATAR (PRIVATE)
