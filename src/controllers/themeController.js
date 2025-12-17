@@ -34,7 +34,7 @@ export const saveThemeController = async (req, res) => {
     });
     return res.status(200).json({ message: 'Theme saved', theme });
   } catch (error) {
-    console.error('Theme save error:', error);
+    console.error('Theme save error:', error); // ✅ повний лог помилки
     return res
       .status(500)
       .json({ message: 'Database error', error: error.message });
@@ -57,7 +57,7 @@ export const getThemeController = async (req, res) => {
 
     return res.status(200).json({ theme });
   } catch (error) {
-    console.error('Theme get error:', error);
+    console.error('Theme get error:', error); // ✅ повний лог помилки
     return res
       .status(500)
       .json({ message: 'Database error', error: error.message });
